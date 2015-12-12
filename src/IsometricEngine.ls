@@ -26,7 +26,7 @@
 					{
 						var t:Tile = new Tile;
 
-						t.water = pn.GetRandomHeight(i, j, 1, 0.33, 0.5, 0.5, 0.5);
+						t.water = pn.GetRandomHeight(i, j, 1, 0.33, 0.6, 0.5, 0.5);
 						t.x = startX + (i * Tile.VIRTUAL_WIDTH / 2) + (j * -Tile.VIRTUAL_WIDTH / 2 );
 						t.y = startY + (i * Tile.VIRTUAL_HEIGHT / 2) + (j * Tile.VIRTUAL_HEIGHT / 2);
 
