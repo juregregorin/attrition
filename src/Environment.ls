@@ -97,7 +97,7 @@ package
 				entity.render();
 			}
 
-			manaDisplay.setText = "test";
+			manaDisplay.setText("test");
 		}
 
 		public function getUI():Sprite
