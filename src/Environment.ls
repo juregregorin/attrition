@@ -1,9 +1,14 @@
 package
 {
+	import loom2d.display.TextAlign;
 	import loom2d.display.Image;
 	import loom2d.display.Sprite;
 	import loom2d.display.Stage;
 	import IsometricEngine;
+	import loom2d.display.TextFormat;
+	import loom2d.textures.Texture;
+	import ui.Portrait;
+	import ui.ProgressUI;
 	import ui.TextUI;
 
 	public class Environment
@@ -21,6 +26,10 @@ package
 		private var simulation:Simulation;
 
 		private var testText:ui.TextUI;
+		private var testProgress:ProgressUI;
+		private var manaDisplay:TextUI;
+
+		private var portrait:Portrait;
 
 		public function Environment(stage:Stage)
 		{
@@ -30,15 +39,31 @@ package
 
 			Entity.environment = this;
 
-			testText = new ui.TextUI();
+			testText = new TextUI();
 
-			testText.setText("Test text");
+			testProgress = new ProgressUI();
+
+			portrait = new Portrait();
+			portrait.setPosition(stage.stageWidth / 2, 40);
+
+			manaDisplay = new TextUI();
+			manaDisplay.setPosition(portrait.getPosition().x - 150, portrait.getPosition().y);
+			var manaF:TextFormat = manaDisplay.format;
+			manaF.align = TextAlign.RIGHT;
+			manaF.size = 20;
+			manaDisplay.format = manaF;
+			addEntity(manaDisplay);
 
 			iso = new IsometricEngine;
 			stage.addChild(iso);
 
 			simulation = new Simulation();
 			addEntity(testText);
+			addEntity(testProgress);
+			addEntity(portrait);
+
+			background = new Image(Texture.fromAsset("assets/back.png"));
+			stage.addChild(background);
 
 			stage.addChild(ui);
 		}
@@ -53,10 +78,10 @@ package
 			for (var i:int = 0; i < entities.length; i++)
 			{
 				var entity = entities[i];
-				entity.tick(t, dt);
+				entity.tick(dt);
 			}
 
-			t += dt;
+			testProgress.progress = testProgress.progress >= 1 ? 0 : testProgress.progress + dt;
 
 			simulation.tick(dt);
 		}
@@ -64,12 +89,15 @@ package
 		public function render()
 		{
 			testText.setText("Current population: " + simulation.currentPopulation);
+			manaDisplay.setText("20");
 
 			for (var i:int = 0; i < entities.length; i++)
 			{
 				var entity = entities[i];
-				entity.render(t);
+				entity.render();
 			}
+
+			manaDisplay.setText = "test";
 		}
 
 		public function getUI():Sprite
