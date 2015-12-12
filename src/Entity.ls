@@ -13,6 +13,8 @@ package
 
 		protected var members:Vector.<Entity>;
 
+		public var rotation:Number = 0;
+
 		public function Entity() {}
 
 		public function setPosition(x:Number, y:Number)
@@ -43,13 +45,19 @@ package
 			}
 		}
 
-		public function render() {
+		public function render()
+		{
 			for (var i = 0; members != null && i < members.length; i++)
 			{
 				var member:Entity = members[i];
 				member.render();
 				trace("!");
 			}
+		}
+
+		public function destroy()
+		{
+
 		}
 	}
 

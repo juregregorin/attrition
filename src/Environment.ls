@@ -7,6 +7,7 @@ package
 	import IsometricEngine;
 	import loom2d.display.TextFormat;
 	import loom2d.textures.Texture;
+	import ui.Card;
 	import ui.Portrait;
 	import ui.ProgressUI;
 	import ui.TextUI;
@@ -31,6 +32,9 @@ package
 
 		private var portrait:Portrait;
 
+		private var cardTimer:Number = 0;
+		private var cardTreshold:Number = 5;
+
 		public function Environment(stage:Stage)
 		{
 			this.w = Const.SCREEN_WIDTH;
@@ -49,7 +53,7 @@ package
 			portrait = new Portrait();
 			portrait.setPosition(stage.stageWidth / 2, 40);
 
-			manaDisplay = new TextUI();
+			manaDisplay = new TextUI(1);
 			manaDisplay.setPosition(portrait.getPosition().x - 150, portrait.getPosition().y);
 			var manaF:TextFormat = manaDisplay.format;
 			manaF.align = TextAlign.RIGHT;
@@ -80,6 +84,13 @@ package
 				var entity = entities[i];
 				entity.tick(dt);
 			}
+
+			if (cardTimer > cardTreshold)
+			{
+				cardTimer -= cardTreshold;
+				Card.addCard(Card.TYPE_RAIN);
+			}
+			cardTimer += dt;
 
 			testProgress.progress = testProgress.progress >= 1 ? 0 : testProgress.progress + dt;
 
