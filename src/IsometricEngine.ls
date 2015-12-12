@@ -4,10 +4,6 @@
 		import loom2d.textures.Texture;
 		import TileType;
 
-		/**
-		 * ...
-		 * @author Jure Gregorin
-		 */
 		public class IsometricEngine extends DisplayObjectContainer
 		{
 			private var tiles:Vector.<Vector.<Tile>>;
@@ -17,9 +13,10 @@
 			{
 
 				tiles = new Vector.<Vector.<Tile>>;
+				var pn = new PerlinNoise(Const.NUM_TILES, Const.NUM_TILES);
 
 				var startX:Number = Const.SCREEN_WIDTH / 2 - Tile.VIRTUAL_WIDTH / 2;
-				var startY:Number = 50;
+				var startY:Number = 100;
 
 				for (var i = 0; i < Const.NUM_TILES; i++)
 				{
@@ -28,14 +25,8 @@
 					for (var j = 0; j < Const.NUM_TILES; j++)
 					{
 						var t:Tile = new Tile;
-						if (Math.randomRangeInt(0, 1) == 0)
-						{
-							t.type = TileType.Desert;
-						}
-						else
-						{
-							t.type = TileType.Forest;
-						}
+
+						t.water = pn.GetRandomHeight(i, j, 1, 0.33, 0.5, 0.5, 0.5);
 						t.x = startX + (i * Tile.VIRTUAL_WIDTH / 2) + (j * -Tile.VIRTUAL_WIDTH / 2 );
 						t.y = startY + (i * Tile.VIRTUAL_HEIGHT / 2) + (j * Tile.VIRTUAL_HEIGHT / 2);
 

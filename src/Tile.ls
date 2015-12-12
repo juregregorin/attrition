@@ -6,6 +6,7 @@ package
 	public enum TileType
 	{
 		Desert,
+		Temperate,
 		Forest,
 		Ugabuga,
 		Bottom,
@@ -19,22 +20,26 @@ package
 		{
 			textureMap = new Dictionary.<TileType, Vector.<Texture>>;
 			textureMap[TileType.Bottom] = new Vector.<Texture>;
-			textureMap[TileType.Bottom].push(Texture.fromAsset("assets/tiles/drought_bottom_D1.png"));
-			textureMap[TileType.Bottom].push(Texture.fromAsset("assets/tiles/drought_bottom_D2.png"));
-			textureMap[TileType.Bottom].push(Texture.fromAsset("assets/tiles/drought_bottom_D3.png"));
+			textureMap[TileType.Bottom].push(Texture.fromAsset("assets/tiles/bottom1.png"));
+			textureMap[TileType.Bottom].push(Texture.fromAsset("assets/tiles/bottom2.png"));
+			textureMap[TileType.Bottom].push(Texture.fromAsset("assets/tiles/bottom3.png"));
 			textureMap[TileType.Desert] = new Vector.<Texture>;
-			textureMap[TileType.Desert].push(Texture.fromAsset("assets/tiles/drought_tile1.png"));
-			textureMap[TileType.Desert].push(Texture.fromAsset("assets/tiles/drought_tile2.png"));
-			textureMap[TileType.Desert].push(Texture.fromAsset("assets/tiles/drought_tile1.png"));
+			textureMap[TileType.Desert].push(Texture.fromAsset("assets/tiles/desert1.png"));
+			textureMap[TileType.Desert].push(Texture.fromAsset("assets/tiles/desert2.png"));
+			textureMap[TileType.Desert].push(Texture.fromAsset("assets/tiles/desert3.png"));
+			textureMap[TileType.Temperate] = new Vector.<Texture>;
+			textureMap[TileType.Temperate].push(Texture.fromAsset("assets/tiles/temperate1.png"));
+			textureMap[TileType.Temperate].push(Texture.fromAsset("assets/tiles/temperate2.png"));
+			textureMap[TileType.Temperate].push(Texture.fromAsset("assets/tiles/temperate2.png"));
 			textureMap[TileType.Forest] = new Vector.<Texture>;
-			textureMap[TileType.Forest].push(Texture.fromAsset("assets/tiles/forest_tile1.png"));
-			textureMap[TileType.Forest].push(Texture.fromAsset("assets/tiles/forest_tile2.png"));
-			textureMap[TileType.Forest].push(Texture.fromAsset("assets/tiles/forest_tile3.png"));
+			textureMap[TileType.Forest].push(Texture.fromAsset("assets/tiles/forest1.png"));
+			textureMap[TileType.Forest].push(Texture.fromAsset("assets/tiles/forest2.png"));
+			textureMap[TileType.Forest].push(Texture.fromAsset("assets/tiles/forest3.png"));
 			textureMap[TileType.Ugabuga] = new Vector.<Texture>;
-			textureMap[TileType.Ugabuga].push(Texture.fromAsset("assets/tiles/ugabuga_tile1.png"));
-			textureMap[TileType.Ugabuga].push(Texture.fromAsset("assets/tiles/ugabuga_tile2.png"));
-			textureMap[TileType.Ugabuga].push(Texture.fromAsset("assets/tiles/ugabuga_tile3.png"));
-			textureMap[TileType.Ugabuga].push(Texture.fromAsset("assets/tiles/ugabuga_tile4.png"));
+			textureMap[TileType.Ugabuga].push(Texture.fromAsset("assets/tiles/settlement1.png"));
+			textureMap[TileType.Ugabuga].push(Texture.fromAsset("assets/tiles/settlement2.png"));
+			textureMap[TileType.Ugabuga].push(Texture.fromAsset("assets/tiles/settlement3.png"));
+			textureMap[TileType.Ugabuga].push(Texture.fromAsset("assets/tiles/settlement4.png"));
 		}
 
 		public static function getTexture(type:TileType, variant:Number):Texture
@@ -56,6 +61,8 @@ package
 		public static const VIRTUAL_HEIGHT = 22;
 
 		private var _population:Number;
+		private var _water:Number;
+
 		private var _type:TileType;
 		private var _variant:Number;
 		private var _canPopulate:Boolean;
@@ -75,6 +82,29 @@ package
 		public function set population(p:Number):void
 		{
 			_population = p;
+		}
+
+		public function get water():Number
+		{
+			return _water;
+		}
+
+		public function set water(value:Number)
+		{
+			_water = value;
+
+			if (_water < 0.33)
+			{
+				type = TileType.Desert;
+			}
+			else if (_water < 0.66)
+			{
+				type = TileType.Temperate;
+			}
+			else
+			{
+				type = TileType.Forest;
+			}
 		}
 
 		public function set type(t:TileType):void
