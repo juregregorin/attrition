@@ -23,7 +23,6 @@ package
 				elapsedTime -= SIMULATION_TICK_TIME;
 				simulationTick();
 			}
-			//trace(elapsedTime);
 		}
 
 		public function simulationTick():void

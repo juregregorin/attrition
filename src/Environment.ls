@@ -31,14 +31,12 @@ package
 			simulation = new Simulation();
 		}
 
-		public function tick(t:Number, dt:Number)
+		public function tick(dt:Number)
 		{
-			t += dt;
-
 			simulation.tick(dt);
 		}
 
-		public function render(t:Number)
+		public function render()
 		{
 
 		}

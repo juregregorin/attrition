@@ -1,6 +1,7 @@
 package
 {
 	import loom.Application;
+	import loom.gameframework.TimeManager;
 	import loom2d.display.StageScaleMode;
 	import loom2d.display.Image;
 	import loom2d.textures.Texture;
@@ -9,13 +10,10 @@ package
 
 	public class Attrition extends Application
 	{
-		/** Simulation delta time */
-		private var dt = 1 / 60;
-
-		/** Simulation time */
-		private var t = 0;
-
 		private var environment:Environment;
+
+		[Inject]
+		private var time:TimeManager;
 
 		override public function run():void
 		{
@@ -28,13 +26,14 @@ package
 
 		override public function onTick()
 		{
-			environment.tick(t, dt);
+			environment.tick(time.deltaTime);
+
 			return super.onTick();
 		}
 
 		override public function onFrame()
 		{
-			environment.render(t);
+			environment.render();
 			return super.onFrame();
 		}
 	}
