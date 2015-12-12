@@ -11,29 +11,27 @@ package
 	{
 		/** Simulation delta time */
 		private var dt = 1 / 60;
-		
+
 		/** Simulation time */
 		private var t = 0;
-		private var w = 1280;
-		private var h = 720;
-		
+
 		private var environment:Environment;
-		
+
 		override public function run():void
 		{
 			stage.scaleMode = StageScaleMode.LETTERBOX;
-			
+
 			TextureSmoothing.defaultSmoothing = TextureSmoothing.NONE;
-			
-			environment = new Environment(stage, w, h);
+
+			environment = new Environment(stage);
 		}
-		
+
 		override public function onTick()
 		{
 			environment.tick(t, dt);
 			return super.onTick();
 		}
-		
+
 		override public function onFrame()
 		{
 			environment.render(t);

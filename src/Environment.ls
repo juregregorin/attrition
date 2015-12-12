@@ -19,7 +19,8 @@ package
 
 		public function Environment(stage:Stage, w:int, h:int)
 		{
-			this.w = w;
+			this.w = Const.SCREEN_WIDTH;
+			this.h = Const.SCREEN_HEIGHT;
 			this.h = h;
 
 			Entity.environment = this;
@@ -28,6 +29,10 @@ package
 
 			testText.setText("Test text");
 
+			iso = new IsometricEngine;
+			stage.addChild(iso);
+
+			simulation = new Simulation();
 			addEntity(testText);
 
 			stage.addChild(ui);
@@ -47,6 +52,8 @@ package
 			}
 
 			t += dt;
+
+			simulation.tick(dt);
 		}
 
 		public function render(t:Number)
