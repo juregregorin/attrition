@@ -2,10 +2,6 @@ package
 {
 	import loom2d.math.Point;
 
-	/**
-	 * ...
-	 * @author Tadej
-	 */
 	public class Entity
 	{
 		public var children:Vector.<Entity>;
@@ -27,6 +23,13 @@ package
 		{
 			return p;
 		}
+		
+		public function tick(t:Number, dt:Number)
+		{
+			
+		}
+		
+		public function render(t:Number) { }
 	}
 
 }
