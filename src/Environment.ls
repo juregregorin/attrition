@@ -15,9 +15,12 @@ package
 
 		private var entities = new Vector.<Entity>();
 
+		private var iso:IsometricEngine;
+		private var simulation:Simulation;
+
 		private var testText:TextUI;
 
-		public function Environment(stage:Stage, w:int, h:int)
+		public function Environment(stage:Stage)
 		{
 			this.w = Const.SCREEN_WIDTH;
 			this.h = Const.SCREEN_HEIGHT;
