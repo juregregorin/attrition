@@ -4,10 +4,16 @@ package
 
 	public class Entity
 	{
+		public static var STATE_IDLE:String = "idle";
+		public static var STATE_DESTROYED:String = "destroyed";
+
+		private var state:String = STATE_IDLE;
+
 		public var children:Vector.<Entity>;
 
 		/* Position */
-		protected var p:Point;
+		public var x:Number = 0;
+		public var y:Number = 0;
 
 		public static var environment:Environment = null;
 
@@ -19,8 +25,8 @@ package
 
 		public function setPosition(x:Number, y:Number)
 		{
-			p.x = x;
-			p.y = y;
+			this.x = x;
+			this.y = y;
 		}
 
 		public function addMember(e:Entity)
@@ -33,7 +39,7 @@ package
 
 		public function getPosition():Point
 		{
-			return p;
+			return new Point(x, y);
 		}
 
 		public function tick(dt:Number)
@@ -57,7 +63,12 @@ package
 
 		public function destroy()
 		{
+			state = STATE_DESTROYED;
+		}
 
+		public function getState():String
+		{
+			return state;
 		}
 	}
 
