@@ -3,6 +3,8 @@ package
 	import loom2d.display.Image;
 	import loom2d.display.Sprite;
 	import loom2d.display.Stage;
+	import IsometricEngine;
+	import ui.TextUI;
 
 	public class Environment
 	{
@@ -18,7 +20,7 @@ package
 		private var iso:IsometricEngine;
 		private var simulation:Simulation;
 
-		private var testText:TextUI;
+		private var testText:ui.TextUI;
 
 		public function Environment(stage:Stage)
 		{
@@ -28,7 +30,7 @@ package
 
 			Entity.environment = this;
 
-			testText = new TextUI();
+			testText = new ui.TextUI();
 
 			testText.setText("Test text");
 
@@ -61,6 +63,8 @@ package
 
 		public function render(t:Number)
 		{
+			testText.setText("Current population: " + simulation.currentPopulation);
+
 			for (var i:int = 0; i < entities.length; i++)
 			{
 				var entity = entities[i];
@@ -68,7 +72,7 @@ package
 			}
 		}
 
-		public function getUILayer():Sprite
+		public function getUI():Sprite
 		{
 			return ui;
 		}
