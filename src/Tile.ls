@@ -6,6 +6,7 @@ package
 	public enum TileType
 	{
 		Desert,
+		Arid,
 		Temperate,
 		Forest,
 		Ugabuga,
@@ -27,10 +28,15 @@ package
 			textureMap[TileType.Desert].push(Texture.fromAsset("assets/tiles/desert1.png"));
 			textureMap[TileType.Desert].push(Texture.fromAsset("assets/tiles/desert2.png"));
 			textureMap[TileType.Desert].push(Texture.fromAsset("assets/tiles/desert3.png"));
+			textureMap[TileType.Arid] = new Vector.<Texture>;
+			textureMap[TileType.Arid].push(Texture.fromAsset("assets/tiles/arid1.png"));
+			textureMap[TileType.Arid].push(Texture.fromAsset("assets/tiles/arid2.png"));
+			textureMap[TileType.Arid].push(Texture.fromAsset("assets/tiles/arid2.png"));
 			textureMap[TileType.Temperate] = new Vector.<Texture>;
 			textureMap[TileType.Temperate].push(Texture.fromAsset("assets/tiles/temperate1.png"));
 			textureMap[TileType.Temperate].push(Texture.fromAsset("assets/tiles/temperate2.png"));
-			textureMap[TileType.Temperate].push(Texture.fromAsset("assets/tiles/temperate2.png"));
+			textureMap[TileType.Temperate].push(Texture.fromAsset("assets/tiles/temperate3.png"));
+			textureMap[TileType.Temperate].push(Texture.fromAsset("assets/tiles/temperate4.png"));
 			textureMap[TileType.Forest] = new Vector.<Texture>;
 			textureMap[TileType.Forest].push(Texture.fromAsset("assets/tiles/forest1.png"));
 			textureMap[TileType.Forest].push(Texture.fromAsset("assets/tiles/forest2.png"));
@@ -93,11 +99,15 @@ package
 		{
 			_water = value;
 
-			if (_water < 0.33)
+			if (_water < 0.25)
 			{
 				type = TileType.Desert;
 			}
-			else if (_water < 0.66)
+			else if (_water < 0.5)
+			{
+				type = TileType.Arid;
+			}
+			else if (_water < 0.75)
 			{
 				type = TileType.Temperate;
 			}
@@ -105,6 +115,11 @@ package
 			{
 				type = TileType.Forest;
 			}
+		}
+
+		public function removePopulated()
+		{
+			water = _water;
 		}
 
 		public function set type(t:TileType):void
@@ -137,6 +152,16 @@ package
 		public function set canPopulate(value:Boolean):void
 		{
 			_canPopulate = value;
+		}
+
+		public function get foodConsumption():Number
+		{
+			return Math.log(1 + _population * 0.25);
+		}
+
+		public function get foodProduction():Number
+		{
+			return Math.log(1 + _population * 0.4 * water);
 		}
 	}
 }
