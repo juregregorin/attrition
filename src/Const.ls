@@ -9,6 +9,8 @@ package
 	{
 		public static const SCREEN_WIDTH = 1280;
 		public static const SCREEN_HEIGHT = 720;
+
+		public static const NUM_TILES = 25;
 	}
 
 }

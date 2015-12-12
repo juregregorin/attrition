@@ -35,7 +35,7 @@ package
 			iso = new IsometricEngine;
 			stage.addChild(iso);
 
-			simulation = new Simulation();
+			simulation = new Simulation(iso);
 			addEntity(testText);
 
 			stage.addChild(ui);
