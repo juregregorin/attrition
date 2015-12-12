@@ -33,7 +33,7 @@ package
 			g.drawTextLine(225, 25, s);
 		}
 
-		public override function render(t:Number)
+		public override function render()
 		{
 			textShape.x = p.x;
 			textShape.y = p.y;

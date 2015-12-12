@@ -23,13 +23,13 @@ package
 		{
 			return p;
 		}
-		
-		public function tick(t:Number, dt:Number)
+
+		public function tick(dt:Number)
 		{
-			
+
 		}
-		
-		public function render(t:Number) { }
+
+		public function render() { }
 	}
 
 }

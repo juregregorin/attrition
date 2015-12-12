@@ -5,10 +5,10 @@ package
 
 	public class Tile extends Image
 	{
-		public static const WIDTH = 64;
-		public static const HEIGHT = 64;
-		public static const VIRTUAL_WIDTH = 32;
-		public static const VIRTUAL_HEIGHT = 20;
+		public static const WIDTH = 50;
+		public static const HEIGHT = 58;
+		public static const VIRTUAL_WIDTH = 22;
+		public static const VIRTUAL_HEIGHT = 10;
 
 		public function Tile()
 		{

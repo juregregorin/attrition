@@ -51,10 +51,8 @@ package
 			for (var i:int = 0; i < entities.length; i++)
 			{
 				var entity = entities[i];
-				entity.tick(t, dt);
+				entity.tick(dt);
 			}
-
-			t += dt;
 
 			simulation.tick(dt);
 		}
@@ -64,7 +62,7 @@ package
 			for (var i:int = 0; i < entities.length; i++)
 			{
 				var entity = entities[i];
-				entity.render(t);
+				entity.render();
 			}
 		}
 
