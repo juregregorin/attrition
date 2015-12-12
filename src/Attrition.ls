@@ -14,8 +14,6 @@ package
 		
 		/** Simulation time */
 		private var t = 0;
-		private var w = 1280;
-		private var h = 720;
 		
 		private var environment:Environment;
 		
@@ -25,7 +23,7 @@ package
 			
 			TextureSmoothing.defaultSmoothing = TextureSmoothing.NONE;
 			
-			environment = new Environment(stage, w, h);
+			environment = new Environment(stage);
 		}
 		
 		override public function onTick()

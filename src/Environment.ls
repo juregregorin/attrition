@@ -14,13 +14,18 @@ package
 		
 		private var background:Image;
 		
-		public function Environment(stage:Stage, w:int, h:int) 
+		private var iso:IsometricEngine;
+		
+		public function Environment(stage:Stage) 
 		{
-			this.w = w;
+			this.w = Const.SCREEN_WIDTH;
+			this.h = Const.SCREEN_HEIGHT;
 			this.h = h;
 			
 			Entity.environment = this;
 			
+			iso = new IsometricEngine;
+			stage.addChild(iso);
 		}
 		
 		public function tick(t:Number, dt:Number)
