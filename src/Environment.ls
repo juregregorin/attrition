@@ -39,6 +39,9 @@ package
 
 			Entity.environment = this;
 
+			background = new Image(Texture.fromAsset("assets/back.png"));
+			stage.addChild(background);
+
 			testText = new TextUI();
 
 			testProgress = new ProgressUI();
@@ -61,9 +64,6 @@ package
 			addEntity(testText);
 			addEntity(testProgress);
 			addEntity(portrait);
-
-			background = new Image(Texture.fromAsset("assets/back.png"));
-			stage.addChild(background);
 
 			stage.addChild(ui);
 		}
