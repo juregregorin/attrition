@@ -1,4 +1,4 @@
-package 
+package
 {
 	import loom2d.display.Image;
 	import loom2d.textures.Texture;
@@ -9,8 +9,8 @@ package
 		public static const HEIGHT = 64;
 		public static const VIRTUAL_WIDTH = 32;
 		public static const VIRTUAL_HEIGHT = 20;
-		
-		public function Tile() 
+
+		public function Tile()
 		{
 			width = WIDTH;
 			height = HEIGHT;
