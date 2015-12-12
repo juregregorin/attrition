@@ -48,7 +48,7 @@ package
 			entities.push(e);
 		}
 
-		public function tick(t:Number, dt:Number)
+		public function tick(dt:Number)
 		{
 			for (var i:int = 0; i < entities.length; i++)
 			{
@@ -61,7 +61,7 @@ package
 			simulation.tick(dt);
 		}
 
-		public function render(t:Number)
+		public function render()
 		{
 			testText.setText("Current population: " + simulation.currentPopulation);
 
