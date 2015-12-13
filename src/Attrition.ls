@@ -19,8 +19,6 @@ package
 		{
 			stage.scaleMode = StageScaleMode.LETTERBOX;
 
-			TextureSmoothing.defaultSmoothing = TextureSmoothing.NONE;
-
 			environment = new Environment(stage);
 		}
 
