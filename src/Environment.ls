@@ -108,6 +108,8 @@ package
 		public function render()
 		{
 			testText.setText("Current population: " + simulation.currentPopulation);
+			testText.setText("Current food: " + simulation.currentFood);
+			testText.setText("Food trend: " + simulation.foodTrend);
 			manaDisplay.setText("20");
 
 			for (var i:int = 0; i < entities.length; i++)

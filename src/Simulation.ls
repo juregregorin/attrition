@@ -10,6 +10,7 @@ package
 		private var isometric:IsometricEngine;
 
 		private var foodStatus:Number = 10;
+		private var foodBalance:Number = 0;
 
 		public function Simulation(iso:IsometricEngine)
 		{
@@ -30,7 +31,7 @@ package
 
 		public function simulationTick():void
 		{
-			var foodBalance = 0;
+			foodBalance = 0;
 			for (var i = 0; i < Const.NUM_TILES; i++)
 			{
 				for (var j = 0; j < Const.NUM_TILES; j++)
@@ -73,9 +74,6 @@ package
 				starve(1);
 				foodStatus = 0;
 			}
-
-			trace("balance: " + foodBalance);
-			trace("food: " + foodStatus);
 		}
 
 		private function sortFoodProduction(a:Tile, b:Tile):Number
@@ -173,6 +171,16 @@ package
 			}
 
 			return totalPopulation;
+		}
+
+		public function get currentFood():Number
+		{
+			return foodStatus;
+		}
+
+		public function get foodTrend():Number
+		{
+			return foodBalance;
 		}
 	}
 }
