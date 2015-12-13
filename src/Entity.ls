@@ -7,7 +7,7 @@ package
 		public static var STATE_IDLE:String = "idle";
 		public static var STATE_DESTROYED:String = "destroyed";
 
-		private var state:String = STATE_IDLE;
+		protected var state:String = STATE_IDLE;
 
 		public var children:Vector.<Entity>;
 

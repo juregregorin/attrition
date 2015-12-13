@@ -29,6 +29,7 @@ package
 		private var testText:ui.TextUI;
 		private var testProgress:ProgressUI;
 		private var manaDisplay:TextUI;
+		private var cards:Sprite;
 
 		private var portrait:Portrait;
 
@@ -50,6 +51,8 @@ package
 
 			testProgress = new ProgressUI();
 
+			cards = new Sprite();
+
 			portrait = new Portrait();
 			portrait.setPosition(stage.stageWidth / 2, 40);
 
@@ -70,8 +73,10 @@ package
 			addEntity(portrait);
 
 			stage.addChild(ui);
+			stage.addChild(cards);
 
-			Card.setLocation(stage.stageWidth - 100, stage.stageHeight - 50);
+			cards.x = stage.stageWidth -200;
+			cards.y = stage.nativeStageHeight - 50;
 		}
 
 		private function addEntity(e:Entity)
@@ -117,6 +122,11 @@ package
 		public function getUI():Sprite
 		{
 			return ui;
+		}
+
+		public function getCardUI():Sprite
+		{
+			return cards;
 		}
 	}
 

@@ -3,17 +3,24 @@ package ui
 	import loom2d.animation.Transitions;
 	import loom2d.animation.Tween;
 	import loom2d.display.Image;
+	import loom2d.events.Touch;
+	import loom2d.events.TouchEvent;
+	import loom2d.events.TouchPhase;
 	import loom2d.Loom2D;
 	import loom2d.math.Point;
+	import loom2d.math.Rectangle;
 	import loom2d.textures.Texture;
 	import Entity;
 
 	public class Card extends Entity
 	{
+		private static var STATE_HOVER:String = "hover";
+		private static var STATE_USED:String = "used";
+
 		private static var CARDS:Vector.<Card> = new Vector.<Card>();
 		private static var TWEENS:Vector.<Tween> = new Vector.<Tween>();
+		private static var CARD_LOCATIONS:Vector.<Point> = new Vector.<Point>();
 		private static var MAX_CARDS:int = 3;
-		private static var position:Point = Point.ZERO;
 
 		public static var TYPE_RAIN:String = "rain";
 		public static var TYPE_FOOD:String = "food";
@@ -23,7 +30,7 @@ package ui
 
 		private static var tweenTime:Number = 1;
 
-		private var img:Image;
+		private var img:ImageCard;
 
 		public function Card()
 		{
@@ -35,9 +42,11 @@ package ui
 				cardImages = new Vector.<Image>();
 			}
 
-			img = new Image(cardFace);
+			img = new ImageCard(cardFace);
 			img.center();
-			environment.getUI().addChild(img);
+			environment.getCardUI().addChild(img);
+
+			img.addEventListener(TouchEvent.TOUCH, touchEvent);
 		}
 
 		override public function destroy()
@@ -59,6 +68,13 @@ package ui
 			super.render();
 		}
 
+		override public function tick(dt:Number)
+		{
+
+
+			super.tick(dt);
+		}
+
 		public static function addCard(cardType:String):Card
 		{
 			if (CARDS.length >= MAX_CARDS) return null;
@@ -67,8 +83,13 @@ package ui
 
 			var t = new Tween(c, 1, Transitions.EASE_OUT);
 			TWEENS.push(t);
+			CARD_LOCATIONS.push(Point.ZERO);
+
+			c.x = -200;
+			c.y = -200;
 
 			sortCards();
+			defaultSort();
 
 			return c;
 		}
@@ -77,72 +98,36 @@ package ui
 		{
 			if (CARDS.length == 0) return;
 
-			if (CARDS.length == 1)
-			{
-				CARDS[0].rotation = 0;
-				CARDS[0].setPosition(position.x, position.y);
-				return;
-			}
+			var px = environment.getCardUI().x;
+			var py = environment.getCardUI().y;
 
 			switch (CARDS.length)
 			{
 				case 1:
-					//CARDS[0].rotation = 0;
-					//CARDS[0].setPosition(position.x, position.y - 20);
-					Loom2D.juggler.remove(TWEENS[0]);
-					TWEENS[0].reset(CARDS[0], tweenTime, Transitions.EASE_OUT);
-					TWEENS[0].animate("x", position.x);
-					TWEENS[0].animate("y", position.y - 20);
-					TWEENS[0].animate("rotation", 0);
-					Loom2D.juggler.add(TWEENS[0]);
-
+					animateCard(CARDS[0], TWEENS[0], 0, -20, 0);
 					break;
 				case 2:
-					Loom2D.juggler.remove(TWEENS[0]);
-					TWEENS[0].reset(CARDS[0], tweenTime, Transitions.EASE_OUT);
-					TWEENS[0].animate("x", position.x - 30);
-					TWEENS[0].animate("y", position.y);
-					TWEENS[0].animate("rotation", -Math.PI/15);
-					Loom2D.juggler.add(TWEENS[0]);
-
-					Loom2D.juggler.remove(TWEENS[1]);
-					TWEENS[1].reset(CARDS[1], tweenTime, Transitions.EASE_OUT);
-					TWEENS[1].animate("x", position.x + 30);
-					TWEENS[1].animate("y", position.y);
-					TWEENS[1].animate("rotation", Math.PI/15);
-					Loom2D.juggler.add(TWEENS[1]);
+					animateCard(CARDS[0], TWEENS[0], -30, 0, -Math.PI/15);
+					animateCard(CARDS[1], TWEENS[1],  30, 0,  Math.PI/15);
 
 					break;
 				case 3:
-					Loom2D.juggler.remove(TWEENS[0]);
-					TWEENS[0].reset(CARDS[0], tweenTime, Transitions.EASE_OUT);
-					TWEENS[0].animate("x", position.x - 70);
-					TWEENS[0].animate("y", position.y);
-					TWEENS[0].animate("rotation", -Math.PI/10);
-					Loom2D.juggler.add(TWEENS[0]);
-
-					Loom2D.juggler.remove(TWEENS[1]);
-					TWEENS[1].reset(CARDS[1], tweenTime, Transitions.EASE_OUT);
-					TWEENS[1].animate("x", position.x);
-					TWEENS[1].animate("y", position.y - 20);
-					TWEENS[1].animate("rotation", 0);
-					Loom2D.juggler.add(TWEENS[1]);
-
-					Loom2D.juggler.remove(TWEENS[2]);
-					TWEENS[2].reset(CARDS[2], tweenTime, Transitions.EASE_OUT);
-					TWEENS[2].animate("x", position.x + 70);
-					TWEENS[2].animate("y", position.y);
-					TWEENS[2].animate("rotation", Math.PI/10);
-					Loom2D.juggler.add(TWEENS[2]);
+					animateCard(CARDS[0], TWEENS[0], -90,   0, -Math.PI/10);
+					animateCard(CARDS[1], TWEENS[1],   0, -20,  0);
+					animateCard(CARDS[2], TWEENS[2],  90,   0,  Math.PI/10);
 
 					break;
 			}
 		}
 
-		public static function setLocation(x:Number = 0, y:Number = 0)
+		private static function animateCard(card:Card, tween:Tween, x:Number, y:Number, rotation:Number)
 		{
-			position.x = x;
-			position.y = y;
+			Loom2D.juggler.remove(tween);
+			tween.reset(card, tweenTime, Transitions.EASE_OUT);
+			tween.animate("x", x);
+			tween.animate("y", y);
+			tween.animate("rotation", rotation);
+			Loom2D.juggler.add(tween);
 		}
 
 		public function use()
@@ -164,6 +149,50 @@ package ui
 					TWEENS.remove(TWEENS[i]);
 				}
 			}
+		}
+
+		private function touchEvent(e:TouchEvent)
+		{
+			// Hover
+			var touch = e.getTouch(img, TouchPhase.HOVER);
+			if (touch)
+			{
+				//state = Entity.STATE_IDLE;
+				if (state != STATE_HOVER)
+				{
+					state = STATE_HOVER;
+					animateCard(this, getTween(this), this.x, -50, 0);
+					img.setDepth(-1);
+					environment.getCardUI().sortChildren(ImageCard.zSort);
+				}
+			} else {
+				state = STATE_IDLE;
+				sortCards();
+				defaultSort();
+			}
+		}
+
+		private static function defaultSort()
+		{
+			for (var i = 0; i < CARDS.length; i++)
+			{
+				CARDS[i].getImg().setDepth(i);
+			}
+			environment.getCardUI().sortChildren(ImageCard.zSort);
+		}
+
+		private function getTween(c:Card):Tween
+		{
+			for (var i = 0; i < TWEENS.length; i++) {
+				if ((TWEENS[i] as Tween).target == this)
+					return TWEENS[i];
+			}
+			return null;
+		}
+
+		private function getImg():ImageCard
+		{
+			return img;
 		}
 	}
 
