@@ -59,6 +59,8 @@ package
 			this.h = Const.SCREEN_HEIGHT;
 			this.h = h;
 
+			TextFormat.load("dungeon", "assets/dungeon.ttf");
+
 			Entity.environment = this;
 
 			background = new Image(Texture.fromAsset("assets/back.png"));
@@ -94,6 +96,8 @@ package
 			testProgress = new ProgressUI();
 
 			cards = new Sprite();
+			cards.x = stage.stageWidth -210;
+			cards.y = stage.nativeStageHeight - 70;
 
 			portrait = new Portrait();
 			portrait.setPosition(stage.stageWidth / 2, 40);
@@ -130,9 +134,6 @@ package
 
 			stage.addChild(ui);
 			stage.addChild(cards);
-
-			cards.x = stage.stageWidth -200;
-			cards.y = stage.nativeStageHeight - 50;
 		}
 
 		public static function instance():Environment
