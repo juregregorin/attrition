@@ -1,6 +1,7 @@
 	package
 	{
 		import loom2d.display.DisplayObjectContainer;
+		import loom2d.display.Sprite;
 		import loom2d.textures.Texture;
 		import TileType;
 
@@ -9,8 +10,16 @@
 			private var tiles:Vector.<Vector.<Tile>>;
 			private var bottomTiles:Vector.<Tile>;
 
+			private var baseLayer:Sprite;
+			private var topLayer:Sprite;
+
 			public function IsometricEngine()
 			{
+				baseLayer = new Sprite();
+				addChild(baseLayer);
+
+				topLayer = new Sprite();
+				addChild(topLayer);
 
 				tiles = new Vector.<Vector.<Tile>>;
 				var pn = new PerlinNoise(Const.NUM_TILES, Const.NUM_TILES);
@@ -24,13 +33,12 @@
 
 					for (var j = 0; j < Const.NUM_TILES; j++)
 					{
-						var t:Tile = new Tile;
+						var t:Tile = new Tile(topLayer,  baseLayer);
 
 						t.water = pn.GetRandomHeight(i, j, 1, 0.33, 0.6, 0.5, 0.5);
 						t.x = startX + (i * Tile.VIRTUAL_WIDTH / 2) + (j * -Tile.VIRTUAL_WIDTH / 2 );
 						t.y = startY + (i * Tile.VIRTUAL_HEIGHT / 2) + (j * Tile.VIRTUAL_HEIGHT / 2);
-
-						addChild(t);
+						t.update();
 
 						tiles[i].push(t);
 					}
@@ -48,37 +56,29 @@
 						(pos.foodProduction - pos.foodConsumption) < 0.1)
 					{
 						trace("Init food balance: " + (pos.foodProduction - pos.foodConsumption));
-						pos.type = TileType.Ugabuga;
 						break;
 					}
-
-					pos.population = 0;
-
 				}
 
 				bottomTiles = new Vector.<Tile>;
 
 				for (i = 0; i < Const.NUM_TILES; i++)
 				{
-					t = new Tile;
+					t = new Tile(topLayer, baseLayer);
 					t.x = startX + (i * Tile.VIRTUAL_WIDTH / 2) + ((Const.NUM_TILES - 1) * -Tile.VIRTUAL_WIDTH / 2 );
 					t.y = startY + (i * Tile.VIRTUAL_HEIGHT / 2) + ((Const.NUM_TILES - 1) * Tile.VIRTUAL_HEIGHT / 2) + 46;
 					t.type = TileType.Bottom;
 					t.flip = true;
-
-					addChild(t);
 
 					bottomTiles.push(t);
 				}
 
 				for (i = 0; i < Const.NUM_TILES; i++)
 				{
-					t = new Tile;
+					t = new Tile(topLayer, baseLayer);
 					t.x = startX + ((Const.NUM_TILES - 1) * Tile.VIRTUAL_WIDTH / 2) + (i * -Tile.VIRTUAL_WIDTH / 2 );
 					t.y = startY + ((Const.NUM_TILES - 1) * Tile.VIRTUAL_HEIGHT / 2) + (i * Tile.VIRTUAL_HEIGHT / 2) + 46;
 					t.type = TileType.Bottom;
-
-					addChild(t);
 
 					bottomTiles.push(t);
 				}

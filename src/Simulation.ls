@@ -59,7 +59,6 @@ package
 									if (Math.randomRange(0, 1) <= 0.01)
 									{
 										tt.population = 1;
-										tt.type = TileType.Ugabuga;
 									}
 								}
 							}
