@@ -11,6 +11,8 @@ package
 
 		private var foodStatus:Number = 10;
 		private var foodBalance:Number = 0;
+		private var turnsStarving = 0;
+		private var lastFoodRatio = 1;
 
 		public function Simulation(iso:IsometricEngine)
 		{
@@ -32,6 +34,7 @@ package
 		public function simulationTick():void
 		{
 			foodBalance = 0;
+			var settlements = 0;
 			for (var i = 0; i < Const.NUM_TILES; i++)
 			{
 				for (var j = 0; j < Const.NUM_TILES; j++)
@@ -39,27 +42,39 @@ package
 					var t = isometric.getTile(i, j);
 
 					// Grow the tile population if possible
-					if (t.population > 0 && t.canPopulate)
+					if (t.population > 0)
 					{
-						if (Math.randomRange(0, 1) > 0.0)
+						settlements++;
+						// If odds be, increase local population
+						if (Math.randomRange(0, 1) <= Math.pow(t.population, -1.5) * lastFoodRatio && t.foodProduction - t.foodConsumption >= 0)
 						{
-							var success = populateTile(t);
-							if (!success)
+							t.population += 1;
+						}
+
+						// Test the odds of creating a neighbouring tile
+						var neighbours:Vector.<Tile> = getNeighbours(i, j);
+						neighbours.shuffle();
+						for each(var tt:Tile in neighbours)
+						{
+							if (tt.population == 0)
 							{
-								var neighbours:Vector.<Tile> = getNeighbours(i, j);
-								neighbours.shuffle();
-								for each(var tt:Tile in neighbours)
+								if ((1 - Math.pow(t.population, -0.5)) <= tt.water)
 								{
-									if (tt.canPopulate && populateTile(tt))
-										break;
+									if (Math.randomRange(0, 1) <= 0.01 * lastFoodRatio)
+									{
+										tt.population = 1;
+										settlements++;
+									}
 								}
 							}
-						}
-					}
 
-					// Update stats
-					foodBalance += t.foodProduction;
-					foodBalance -= t.foodConsumption;
+							tt.water -= tt.population * 0.00005;
+						}
+
+						// Update stats
+						foodBalance += t.foodProduction;
+						foodBalance -= t.foodConsumption;
+					}
 
 				}
 			}
@@ -71,9 +86,20 @@ package
 
 			if (foodStatus < 0)
 			{
-				starve(1);
+				turnsStarving++;
+				turnsStarving = Math.clamp(turnsStarving, 0, 10);
+				settlements -= starve(turnsStarving);
 				foodStatus = 0;
 			}
+			else
+			{
+				turnsStarving = 0;
+			}
+
+			var maxFood = 10 + settlements;
+
+			foodStatus = Math.clamp(foodStatus, 0, maxFood);
+			lastFoodRatio = foodStatus / maxFood;
 		}
 
 		private function sortFoodProduction(a:Tile, b:Tile):Number
@@ -81,8 +107,9 @@ package
 			return (a.foodProduction > b.foodProduction) ? 1 : -1;
 		}
 
-		private function starve(num:Number)
+		private function starve(num:Number):Number
 		{
+			var result = 0;
 			var tiles = getPopulatedTiles();
 			tiles.sort(sortFoodProduction);
 			for (var i = 0; i < num; i++)
@@ -94,24 +121,12 @@ package
 				if (tiles[i].population <= 0)
 				{
 					tiles[i].removePopulated();
+					result++;
 				}
 				trace("killing in tile with food production " + tiles[i].foodProduction);
 			}
-		}
 
-		private function populateTile(tile:Tile):Boolean
-		{
-			tile.population += 1;
-			tile.type = TileType.Ugabuga;
-
-			if (tile.population > 5)
-			{
-				tile.population -= 1;
-				tile.canPopulate = false;
-				return false;
-			}
-
-			return true;
+			return result;
 		}
 
 		var tileBuffer:Vector.<Tile> = new Vector.<Tile>;
