@@ -216,7 +216,7 @@ package
 
 		public function get foodConsumption():Number
 		{
-			return Math.log(1 + _population * 0.3);
+			return Math.log(1 + _population * 0.25);
 		}
 
 		public function get foodProduction():Number

@@ -58,6 +58,7 @@
 						trace("Init food balance: " + (pos.foodProduction - pos.foodConsumption));
 						break;
 					}
+					pos.population = 0;
 				}
 
 				bottomTiles = new Vector.<Tile>;
