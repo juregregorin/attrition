@@ -79,7 +79,7 @@ package
 				}
 			}
 
-			if (foodBalance < 0)
+			if (foodBalance <= 0)
 				foodStatus -= 1;
 			else
 				foodStatus += 1;
