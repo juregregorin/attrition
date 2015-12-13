@@ -26,7 +26,6 @@ package
 			{
 				elapsedTime -= SIMULATION_TICK_TIME;
 				simulationTick();
-				trace(currentPopulation);
 			}
 		}
 

@@ -62,8 +62,8 @@ package ui
 
 		public override function render()
 		{
-			textShape.x = p.x;
-			textShape.y = p.y;
+			textShape.x = x;
+			textShape.y = y;
 		}
 	}
 

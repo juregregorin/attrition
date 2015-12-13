@@ -33,8 +33,8 @@ package ui
 		}
 
 		override public function render() {
-			progressBg.x = p.x;
-			progressBg.y = p.y;
+			progressBg.x = x;
+			progressBg.y = y;
 			progressFg.x = progressBg.x;
 			progressFg.y = progressBg.y;
 
