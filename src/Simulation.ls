@@ -104,7 +104,7 @@ package
 
 		private function sortFoodProduction(a:Tile, b:Tile):Number
 		{
-			return (a.foodProduction > b.foodProduction) ? 1 : -1;
+			return (a.foodProduction - a.foodConsumption > b.foodProduction - b.foodConsumption) ? 1 : -1;
 		}
 
 		private function starve(num:Number):Number
