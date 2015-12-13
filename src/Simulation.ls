@@ -145,7 +145,7 @@ package
 			return tileBuffer;
 		}
 
-		private function getNeighbours(x:Number, y:Number):Vector.<Tile>
+		public function getNeighbours(x:Number, y:Number):Vector.<Tile>
 		{
 			tileBuffer.clear();
 
