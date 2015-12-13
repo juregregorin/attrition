@@ -36,8 +36,25 @@
 					}
 				}
 
-				getTile(Math.round(Const.NUM_TILES / 2), Math.round(Const.NUM_TILES / 2)).type = TileType.Ugabuga;
-				getTile(Math.round(Const.NUM_TILES / 2), Math.round(Const.NUM_TILES / 2)).population = 10;
+				// Generate a viable staring point
+				while (true)
+				{
+					var x = Math.randomRangeInt(0, Const.NUM_TILES - 1);
+					var y = Math.randomRangeInt(0, Const.NUM_TILES - 1);
+
+					var pos:Tile = getTile(x, y);
+					pos.population = Const.INITAL_POPULATION;
+					if ((pos.foodProduction - pos.foodConsumption) > 0 &&
+						(pos.foodProduction - pos.foodConsumption) < 0.1)
+					{
+						trace("Init food balance: " + (pos.foodProduction - pos.foodConsumption));
+						pos.type = TileType.Ugabuga;
+						break;
+					}
+
+					pos.population = 0;
+
+				}
 
 				bottomTiles = new Vector.<Tile>;
 

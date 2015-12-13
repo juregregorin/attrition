@@ -71,12 +71,10 @@ package
 
 		private var _type:TileType;
 		private var _variant:Number;
-		private var _canPopulate:Boolean;
 
 		public function Tile()
 		{
 			_population = 0;
-			_canPopulate = true;
 			_variant = Math.randomRangeInt(0, 100);
 		}
 
@@ -98,6 +96,9 @@ package
 		public function set water(value:Number)
 		{
 			_water = value;
+
+			if (population > 0)
+				return;
 
 			if (_water < 0.25)
 			{
@@ -144,19 +145,9 @@ package
 			x += texture.width;
 		}
 
-		public function get canPopulate():Boolean
-		{
-			return _canPopulate;
-		}
-
-		public function set canPopulate(value:Boolean):void
-		{
-			_canPopulate = value;
-		}
-
 		public function get foodConsumption():Number
 		{
-			return Math.log(1 + _population * 0.25);
+			return Math.log(1 + _population * 0.3);
 		}
 
 		public function get foodProduction():Number

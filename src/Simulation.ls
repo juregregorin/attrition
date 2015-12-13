@@ -10,6 +10,7 @@ package
 		private var isometric:IsometricEngine;
 
 		private var foodStatus:Number = 10;
+		private var turnsStarving = 0;
 
 		public function Simulation(iso:IsometricEngine)
 		{
@@ -39,27 +40,38 @@ package
 					var t = isometric.getTile(i, j);
 
 					// Grow the tile population if possible
-					if (t.population > 0 && t.canPopulate)
+					if (t.population > 0)
 					{
-						if (Math.randomRange(0, 1) > 0.0)
+						// If odds be, increase local population
+						if (Math.randomRange(0, 1) <= 0.03 && t.foodProduction - t.foodConsumption >= 0)
 						{
-							var success = populateTile(t);
-							if (!success)
+							t.population += 1;
+						}
+
+						// Test the odds of creating a neighbouring
+						var neighbours:Vector.<Tile> = getNeighbours(i, j);
+						neighbours.shuffle();
+						for each(var tt:Tile in neighbours)
+						{
+							if (tt.population == 0)
 							{
-								var neighbours:Vector.<Tile> = getNeighbours(i, j);
-								neighbours.shuffle();
-								for each(var tt:Tile in neighbours)
+								if ((1 - Math.pow(t.population, -0.5)) <= tt.water)
 								{
-									if (tt.canPopulate && populateTile(tt))
-										break;
+									if (Math.randomRange(0, 1) <= 0.01)
+									{
+										tt.population = 1;
+										tt.type = TileType.Ugabuga;
+									}
 								}
 							}
-						}
-					}
 
-					// Update stats
-					foodBalance += t.foodProduction;
-					foodBalance -= t.foodConsumption;
+							tt.water -= tt.population * 0.00005;
+						}
+
+						// Update stats
+						foodBalance += t.foodProduction;
+						foodBalance -= t.foodConsumption;
+					}
 
 				}
 			}
@@ -71,9 +83,15 @@ package
 
 			if (foodStatus < 0)
 			{
-				starve(1);
+				starve(turnsStarving++);
 				foodStatus = 0;
 			}
+			else
+			{
+				turnsStarving = 0;
+			}
+
+			foodStatus = Math.clamp(foodStatus, 0, 20);
 
 			trace("balance: " + foodBalance);
 			trace("food: " + foodStatus);
@@ -100,21 +118,6 @@ package
 				}
 				trace("killing in tile with food production " + tiles[i].foodProduction);
 			}
-		}
-
-		private function populateTile(tile:Tile):Boolean
-		{
-			tile.population += 1;
-			tile.type = TileType.Ugabuga;
-
-			if (tile.population > 5)
-			{
-				tile.population -= 1;
-				tile.canPopulate = false;
-				return false;
-			}
-
-			return true;
 		}
 
 		var tileBuffer:Vector.<Tile> = new Vector.<Tile>;
