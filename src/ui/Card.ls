@@ -34,24 +34,27 @@ package ui
 		public static var TYPE_MEDITATE:String = "meditate";
 		public static var TYPE_HEAL:String = "heal";
 
-		private static var cardFace:Texture;
 		private static var cardImages:Vector.<Image>;
 
 		private static var tweenTime:Number = 1;
 
 		private static var drawTween:Tween;
 
-		private var img:ImageCard;
+		private var cardBase:ImageCard;
 
+		private var cardType:String = "";
 		private var cardName:String = "";
 		private var manaCost:uint = 0;
 		private var spellIntensity:Number = 0;
 		private var spellDescription:String = "";
 
-		public function Card()
+		private static var minScale:Number = 0.28;
+		private static var maxScale:Number = 0.70;
+
+		public var scale:Number = 1;
+
+		public function Card(type:String = "")
 		{
-			if (cardFace == null)
-				cardFace = Texture.fromAsset("assets/card-face.png");
 
 			if (cardImages == null)
 				cardImages = new Vector.<Image>();
@@ -65,20 +68,27 @@ package ui
 			}
 			else
 			{
-				drawTween.reset(img, tweenTime, Transitions.EASE_IN);
+				drawTween.reset(cardBase, tweenTime, Transitions.EASE_IN);
 			}
 
-			img = new ImageCard(cardFace);
-			img.center();
-			environment.getCardUI().addChild(img);
+			generateCard(type);
+			cardBase = new ImageCard(cardType);
+			cardBase.setText(cardName, manaCost, spellDescription);
 
-			img.addEventListener(TouchEvent.TOUCH, touchEvent);
+			trace("Generated: " + this);
+
+			environment.getCardUI().addChild(cardBase);
+
+			cardBase.scale = 0.35;
+
+			cardBase.addEventListener(TouchEvent.TOUCH, touchEvent);
 		}
 
 		override public function destroy()
 		{
-			environment.getUI().removeChild(img);
-			img = null;
+			environment.getUI().removeChild(cardBase);
+			cardBase.destroy();
+			cardBase = null;
 
 			super.destroy();
 
@@ -88,13 +98,14 @@ package ui
 		override public function render()
 		{
 			if (state == STATE_IN_DECK)
-				img.alpha = 0;
+				cardBase.alpha = 0;
 			else
-				img.alpha = 1;
+				cardBase.alpha = 1;
 
-			img.x = x;
-			img.y = y;
-			img.rotation = rotation;
+			cardBase.x = x;
+			cardBase.y = y;
+			cardBase.rotation = rotation;
+			cardBase.scale = scale;
 
 			super.render();
 		}
@@ -123,13 +134,14 @@ package ui
 						break;
 				}
 
+			cardType = type;
 			switch (type)
 			{
 				case TYPE_FOOD:
 					cardName = "Plentiful Harvest";
 					manaCost = Math.randomRangeInt(1, 6);
 					spellIntensity = 5 * manaCost;
-					spellDescription = "Increase food production in target area by " + spellIntensity + " percent.";
+					spellDescription = "Increase food production in target area by *" + spellIntensity + "* percent.";
 					break;
 				case TYPE_MEDITATE:
 					cardName = "Meditate";
@@ -141,13 +153,13 @@ package ui
 					cardName = "Downpour";
 					manaCost = Math.randomRangeInt(1, 10);
 					spellIntensity = 5 * manaCost;
-					spellDescription = "Restore " + spellIntensity + " percent of water to tiles in target area.";
+					spellDescription = "Restore *" + spellIntensity + "* percent of water to tiles in target area.";
 					break;
 				case TYPE_HEAL:
 					cardName = "Divine Remedy";
 					manaCost = Math.randomRangeInt(3, 10);
-					spellIntensity = 5 * (manaCost-3);
-					spellDescription = "Heal population by " + spellIntensity + " percent and/or remove pleague in target area.";
+					spellIntensity = 5 * (manaCost);
+					spellDescription = "Heal population by *" + spellIntensity + "* percent and/or remove plague in target area.";
 					break;
 			}
 		}
@@ -159,9 +171,7 @@ package ui
 			c.state = STATE_IN_DECK;
 			c.render();
 			c.x = -environment.getCardUI().x + 1280 / 2;
-			c.y = -environment.getCardUI().y - cardFace.height;
-
-			c.generateCard();
+			c.y = -environment.getCardUI().y - c.cardBase.height;
 
 			CARD_DECK.push(c);
 		}
@@ -237,33 +247,34 @@ package ui
 			{
 				case 1:
 					if (CARDS[0].state != STATE_SELECTED && CARDS[0].state != STATE_DRAWING && CARDS[0].state != STATE_IN_DECK)
-						animateCard(CARDS[0], TWEENS[0], 0, -20, 0);
+						animateCard(CARDS[0], TWEENS[0], 0, -20, 0, minScale);
 					break;
 				case 2:
 					if (CARDS[0].state != STATE_SELECTED && CARDS[0].state != STATE_DRAWING && CARDS[0].state != STATE_IN_DECK)
-						animateCard(CARDS[0], TWEENS[0], -30, 0, -Math.PI/15);
+						animateCard(CARDS[0], TWEENS[0], -30, 0, -Math.PI/15, minScale);
 					if (CARDS[1].state != STATE_SELECTED && CARDS[0].state != STATE_DRAWING && CARDS[1].state != STATE_IN_DECK)
-						animateCard(CARDS[1], TWEENS[1],  30, 0,  Math.PI/15);
+						animateCard(CARDS[1], TWEENS[1],  30, 0,  Math.PI/15, minScale);
 
 					break;
 				case 3:
 					if (CARDS[0].state != STATE_SELECTED && CARDS[0].state != STATE_DRAWING && CARDS[0].state != STATE_IN_DECK)
-						animateCard(CARDS[0], TWEENS[0], -90,   0, -Math.PI/10);
+						animateCard(CARDS[0], TWEENS[0], -90,   0, -Math.PI/10, minScale);
 					if (CARDS[1].state != STATE_SELECTED && CARDS[1].state != STATE_DRAWING && CARDS[1].state != STATE_IN_DECK)
-						animateCard(CARDS[1], TWEENS[1],   0, -20,  0);
+						animateCard(CARDS[1], TWEENS[1],   0, -20,  0, minScale);
 					if (CARDS[2].state != STATE_SELECTED && CARDS[2].state != STATE_DRAWING && CARDS[2].state != STATE_IN_DECK)
-						animateCard(CARDS[2], TWEENS[2],  90,   0,  Math.PI/10);
+						animateCard(CARDS[2], TWEENS[2],  90,   0,  Math.PI/10, minScale);
 
 					break;
 			}
 		}
 
-		private static function animateCard(card:Card, tween:Tween, x:Number, y:Number, rotation:Number)
+		private static function animateCard(card:Card, tween:Tween, x:Number, y:Number, rotation:Number, scale:Number = 1)
 		{
 			Loom2D.juggler.remove(tween);
 			tween.reset(card, tweenTime, Transitions.EASE_OUT);
 			tween.animate("x", x);
 			tween.animate("y", y);
+			tween.animate("scale", scale);
 			tween.animate("rotation", rotation);
 			Loom2D.juggler.add(tween);
 		}
@@ -300,7 +311,7 @@ package ui
 			var touch:Touch = null;
 
 			// Click
-			touch = e.getTouch(img, TouchPhase.BEGAN);
+			touch = e.getTouch(cardBase, TouchPhase.BEGAN);
 			if (touch)
 			{
 				if (state == STATE_SELECTED)
@@ -320,13 +331,13 @@ package ui
 			}
 
 			// Hover
-			touch = e.getTouch(img, TouchPhase.HOVER);
+			touch = e.getTouch(cardBase, TouchPhase.HOVER);
 			if (touch)
 			{
 				if (state == STATE_IDLE)
 				{
 					state = STATE_HOVER;
-					animateCard(this, getTween(this), this.x, -50, 0);
+					animateCard(this, getTween(this), -25, -250, 0, Card.maxScale);
 					smartSort();
 					environment.getCardUI().sortChildren(ImageCard.zSort);
 				}
@@ -371,7 +382,7 @@ package ui
 
 		private function getImg():ImageCard
 		{
-			return img;
+			return cardBase;
 		}
 
 		public function toString():String

@@ -33,10 +33,8 @@ package ui
 
 			g = textShape.graphics;
 
-			TextFormat.load("pixelmix", "assets/pixelmix.ttf");
-
 			_format = new TextFormat();
-			_format.font = "pixelmix";
+			_format.font = "dungeon";
 			_format.color = color;
 			_format.size = 12;
 			_format.align = TextAlign.TOP | TextAlign.LEFT;
