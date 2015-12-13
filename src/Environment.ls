@@ -6,6 +6,9 @@ package
 	import loom2d.display.Stage;
 	import IsometricEngine;
 	import loom2d.display.TextFormat;
+	import loom2d.events.Touch;
+	import loom2d.events.TouchEvent;
+	import loom2d.events.TouchPhase;
 	import loom2d.textures.Texture;
 	import ui.Card;
 	import ui.Portrait;
@@ -27,7 +30,10 @@ package
 		private var iso:IsometricEngine;
 		private var simulation:Simulation;
 
-		private var testText:ui.TextUI;
+		private var logText:TextUI;
+
+		private var tempStats:TextUI;
+
 		private var testProgress:ProgressUI;
 		private var manaDisplay:TextUI;
 		private var cards:Sprite;
@@ -42,6 +48,8 @@ package
 
 		private var cardTimer:Number = 0;
 		private var cardTreshold:Number = 2;
+
+		private var cardGetter:Sprite;
 
 		public function Environment(stage:Stage)
 		{
@@ -69,7 +77,19 @@ package
 			fogMiddle = new Image(Texture.fromAsset("assets/fog.png"));
 			stage.addChild(fogMiddle);
 
-			testText = new TextUI();
+			logText = new TextUI(15);
+			logText.x = 5;
+			logText.y = stage.stageHeight - (15 * logText.format.size + 5);
+
+			cardGetter = new Sprite();
+			var cg = new Image(Texture.fromAsset("assets/card-getter.png"));
+			cg.center();
+			cardGetter.addChild(cg);
+			cardGetter.x = stage.stageWidth / 2;
+			ui.addChild(cardGetter);
+			cardGetter.addEventListener(TouchEvent.TOUCH, touchEvent);
+
+			tempStats = new TextUI(3);
 
 			testProgress = new ProgressUI();
 
@@ -90,7 +110,7 @@ package
 			stage.addChild(iso);
 
 			simulation = new Simulation(iso);
-			addEntity(testText);
+			addEntity(logText);
 			addEntity(testProgress);
 			addEntity(portrait);
 
@@ -125,7 +145,7 @@ package
 
 		}
 
-		private function addEntity(e:Entity)
+		public function addEntity(e:Entity)
 		{
 			entities.push(e);
 		}
@@ -138,13 +158,18 @@ package
 				entity.tick(dt);
 			}
 
-			if (cardTimer > cardTreshold)
+			if (!Card.handIsFull() && !Card.deckIsEmpty())
+			{
+				Card.drawCard();
+			}
+
+			/*if (cardTimer > cardTreshold)
 			{
 				cardTimer -= cardTreshold;
 				var c = Card.addCard(Card.TYPE_RAIN);
 				if (c != null) addEntity(c);
 			}
-			cardTimer += dt;
+			cardTimer += dt;*/
 
 			testProgress.progress = testProgress.progress >= 1 ? testProgress.progress - 1 : testProgress.progress + dt;
 
@@ -167,7 +192,10 @@ package
 
 		public function render()
 		{
-			testText.setText("Current population: " + simulation.currentPopulation);
+			tempStats.setText("Current population: " + simulation.currentPopulation, TextUI.COLOR_POSITIVE);
+			tempStats.setText("Current food: " + simulation.currentFood, TextUI.COLOR_NEGATIVE);
+			tempStats.setText("Food trend: " + simulation.foodTrend);
+
 			manaDisplay.setText("20");
 
 			for (var i:int = 0; i < entities.length; i++)
@@ -175,8 +203,6 @@ package
 				var entity = entities[i];
 				entity.render();
 			}
-
-			manaDisplay.setText("test");
 		}
 
 		public function getUI():Sprite
@@ -187,6 +213,20 @@ package
 		public function getCardUI():Sprite
 		{
 			return cards;
+		}
+
+		public function addLog(text:String, color:uint = 0xFFFFFF)
+		{
+			logText.setText(text, color);
+		}
+
+		private function touchEvent(e:TouchEvent)
+		{
+			var touch:Touch = e.getTouch(cardGetter, TouchPhase.BEGAN);
+			if (touch)
+			{
+				Card.newCard();
+			}
 		}
 	}
 

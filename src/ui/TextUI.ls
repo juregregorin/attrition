@@ -8,17 +8,24 @@ package ui
 
 	public class TextUI extends Entity
 	{
+		public static var COLOR_DEFAULT:uint = 0xFFFFFF;
+		public static var COLOR_POSITIVE:uint = 0x00FF00;
+		public static var COLOR_NEGATIVE:uint = 0xFF0000;
+
 		private var g:Graphics;
 
 		var textShape:Shape;
 		var _format:TextFormat;
 
 		protected var textDisplay:Vector.<String>;
+		protected var textColors:Vector.<uint>;
 		protected var textLines:uint;
 
 		public function TextUI(textLines:uint = 5, color:uint = 0xFFFFFF)
 		{
 			textDisplay = new Vector.<String>();
+			textColors = new Vector.<uint>();
+
 			this.textLines = textLines;
 			textShape = new Shape();
 
@@ -42,21 +49,27 @@ package ui
 
 		public function get format():TextFormat { return _format; }
 
-		public function setText(s:String)
+		public function setText(s:String, c:uint = 0xFFFFFF)
 		{
 			g.clear();
-			g.textFormat(_format);
+			//g.textFormat(_format);
 
-			if (textDisplay.length == 0 || textDisplay[textDisplay.length-1] != s)
+			if (textDisplay.length == 0 || textDisplay[textDisplay.length - 1] != s)
+			{
 				textDisplay.push(s);
+				textColors.push(c);
+			}
 
 			if (textDisplay.length > textLines) {
 				textDisplay.shift();
+				textColors.shift();
 			}
 
 			for (var i = 0; i < textDisplay.length; i++)
 			{
-				g.drawTextLine(0, i * 12, textDisplay[i]);
+				_format.color = textColors[i];
+				g.textFormat(_format);
+				g.drawTextLine(0, i * _format.size, textDisplay[i]);
 			}
 		}
 
