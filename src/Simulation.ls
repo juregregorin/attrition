@@ -7,18 +7,14 @@ package
 		private var elapsedTime:Number;
 		private const SIMULATION_TICK_TIME = 1;
 
-		private var isometric:IsometricEngine;
-
 		private var foodStatus:Number = 10;
 		private var foodBalance:Number = 0;
 		private var turnsStarving = 0;
 		private var lastFoodRatio = 1;
 
-		public function Simulation(iso:IsometricEngine)
+		public function Simulation()
 		{
 			elapsedTime = 0;
-
-			isometric = iso;
 		}
 
 		public function tick(dt:Number):void
@@ -39,7 +35,7 @@ package
 			{
 				for (var j = 0; j < Const.NUM_TILES; j++)
 				{
-					var t = isometric.getTile(i, j);
+					var t = Environment.instance().iso.getTile(i, j);
 
 					// Grow the tile population if possible
 					if (t.population > 0)
@@ -58,7 +54,7 @@ package
 						{
 							if (tt.population == 0)
 							{
-								if ((1 - Math.pow(t.population, -0.5)) <= tt.water)
+								if ((1 - Math.log(Math.log(t.population))) / 3 <= tt.water)
 								{
 									if (Math.randomRange(0, 1) <= 0.01 * lastFoodRatio)
 									{
@@ -138,7 +134,7 @@ package
 			{
 				for (var j = 0; j < Const.NUM_TILES; j++)
 				{
-					var t = isometric.getTile(i, j);
+					var t = Environment.instance().iso.getTile(i, j);
 					if (t.population > 0)
 					{
 						tileBuffer.push(t);
@@ -152,6 +148,8 @@ package
 		private function getNeighbours(x:Number, y:Number):Vector.<Tile>
 		{
 			tileBuffer.clear();
+
+			var isometric = Environment.instance().iso;
 
 			if (x - 1 >= 0 && y - 1 >= 0)
 				tileBuffer.push(isometric.getTile(x - 1, y - 1));
@@ -181,7 +179,9 @@ package
 			{
 				for (var j = 0; j < Const.NUM_TILES; j++)
 				{
-					totalPopulation += isometric.getTile(i, j).population;
+					var ii = Environment.instance().iso;
+					var t = ii.getTile(i, j);
+					totalPopulation += t != null ? t.population : 0;
 				}
 			}
 

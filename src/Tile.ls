@@ -17,6 +17,7 @@ package
 		Temperate,
 		Forest,
 		Settlement,
+		Advanced,
 		Bottom,
 	}
 
@@ -44,9 +45,8 @@ package
 			textureMap[TileType.Temperate].push(Texture.fromAsset("assets/tiles/temperate1.png"));
 			textureMap[TileType.Temperate].push(Texture.fromAsset("assets/tiles/temperate2.png"));
 			textureMap[TileType.Forest] = new Vector.<Texture>;
-			textureMap[TileType.Forest].push(Texture.fromAsset("assets/tiles/forest1.png"));
-			textureMap[TileType.Forest].push(Texture.fromAsset("assets/tiles/forest2.png"));
-			textureMap[TileType.Forest].push(Texture.fromAsset("assets/tiles/forest3.png"));
+			textureMap[TileType.Forest].push(Texture.fromAsset("assets/tiles/temperate3.png"));
+			textureMap[TileType.Forest].push(Texture.fromAsset("assets/tiles/temperate4.png"));
 
 			topTextureMap = new Dictionary.<TileType, Vector.<Texture>>;
 			topTextureMap[TileType.Settlement] = new Vector.<Texture>;
@@ -55,6 +55,11 @@ package
 			topTextureMap[TileType.Settlement].push(Texture.fromAsset("assets/tiles/settlement3.png"));
 			topTextureMap[TileType.Settlement].push(Texture.fromAsset("assets/tiles/settlement4.png"));
 			topTextureMap[TileType.Settlement].push(Texture.fromAsset("assets/tiles/settlement5.png"));
+			topTextureMap[TileType.Advanced] = new Vector.<Texture>;
+			topTextureMap[TileType.Advanced].push(Texture.fromAsset("assets/tiles/advanced1.png"));
+			topTextureMap[TileType.Advanced].push(Texture.fromAsset("assets/tiles/advanced2.png"));
+			topTextureMap[TileType.Advanced].push(Texture.fromAsset("assets/tiles/advanced3.png"));
+			topTextureMap[TileType.Advanced].push(Texture.fromAsset("assets/tiles/advanced4.png"));
 			topTextureMap[TileType.Desert] = new Vector.<Texture>;
 			topTextureMap[TileType.Desert].push(Texture.fromAsset("assets/tiles/empty.png"));
 			topTextureMap[TileType.Arid] = new Vector.<Texture>;
@@ -67,7 +72,6 @@ package
 			topTextureMap[TileType.Forest] = new Vector.<Texture>;
 			topTextureMap[TileType.Forest].push(Texture.fromAsset("assets/tiles/forest1.png"));
 			topTextureMap[TileType.Forest].push(Texture.fromAsset("assets/tiles/forest2.png"));
-			topTextureMap[TileType.Forest].push(Texture.fromAsset("assets/tiles/forest3.png"));
 		}
 
 		public static function getTexture(type:TileType, variant:Number):Texture
@@ -118,10 +122,6 @@ package
 
 		override public function hitTest(localPoint:Point, forTouch:Boolean):DisplayObject
 		{
-			// lol, hack
-			// don't know why
-			localPoint.y -= height - Tile.VIRTUAL_HEIGHT;
-
 			if (__points == null)
 			{
 				__points = new Vector.<Point>;
@@ -132,13 +132,13 @@ package
 			}
 
 			__top.x = width / 2;
-			__top.y = height + Tile.VIRTUAL_HEIGHT;
+			__top.y = height - Tile.VIRTUAL_HEIGHT;
 			__bottom.x = width / 2;
 			__bottom.y = height;
 			__left.x = 0;
-			__left.y = height + Tile.VIRTUAL_HEIGHT / 2;
+			__left.y = height - Tile.VIRTUAL_HEIGHT / 2;
 			__right.x = Tile.VIRTUAL_WIDTH;
-			__right.y = height + Tile.VIRTUAL_HEIGHT / 2;
+			__right.y = height - Tile.VIRTUAL_HEIGHT / 2;
 
 			var i = 0;
 			var j = __points.length - 1;
@@ -158,17 +158,32 @@ package
 				return this;
 			}
 
-			return super.hitTest(localPoint, forTouch);
+			return null;
 		}
+
+		static var lastProcessedEvent:TouchEvent;
 
 		private function touchEvent(e:TouchEvent)
 		{
 			if (!touchable)
 				return;
 
-			var touch = e.getTouch(this, TouchPhase.ENDED);
-			if (touch)
+			var t = e.touches[0];
+			var l = t.getLocation(this);
+
+			if (e == lastProcessedEvent || hitTest(l , true) == null)
+				return;
+
+			lastProcessedEvent = e;
+
+			if (t.phase == TouchPhase.BEGAN)
 			{
+				//color = 0xFF0000FF;
+			}
+
+			if (t.phase == TouchPhase.ENDED)
+			{
+				//color = 0xFFFFFFFF;
 				Environment.instance().tileSelected(tile);
 			}
 		}
@@ -307,7 +322,14 @@ package
 					pv = 4;
 				}
 
-				_top.texture = TileTextures.getTopTexture(TileType.Settlement, _variant, pv);
+				if (Environment.instance().simulation.currentPopulation > 500)
+				{
+					_top.texture = TileTextures.getTopTexture(TileType.Advanced, _variant, pv);
+				}
+				else
+				{
+					_top.texture = TileTextures.getTopTexture(TileType.Settlement, _variant, pv);
+				}
 			}
 
 		}

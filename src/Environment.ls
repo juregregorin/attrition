@@ -27,8 +27,8 @@ package
 
 		private var entities = new Vector.<Entity>();
 
-		private var iso:IsometricEngine;
-		private var simulation:Simulation;
+		public var iso:IsometricEngine;
+		public var simulation:Simulation;
 
 		private var logText:TextUI;
 
@@ -74,9 +74,6 @@ package
 			fogBack2.x = fogBack.width;
 			stage.addChild(fogBack2);
 
-			fogMiddle = new Image(Texture.fromAsset("assets/fog.png"));
-			stage.addChild(fogMiddle);
-
 			logText = new TextUI(15);
 			logText.x = 5;
 			logText.y = stage.stageHeight - (15 * logText.format.size + 5);
@@ -106,10 +103,15 @@ package
 			manaDisplay.format = manaF;
 			addEntity(manaDisplay);
 
+			simulation = new Simulation();
+
 			iso = new IsometricEngine;
+			iso.init();
 			stage.addChild(iso);
 
-			simulation = new Simulation(iso);
+			fogMiddle = new Image(Texture.fromAsset("assets/fog.png"));
+			stage.addChild(fogMiddle);
+
 			addEntity(logText);
 			addEntity(testProgress);
 			addEntity(portrait);
@@ -142,7 +144,7 @@ package
 
 		public function tileSelected(tile:Tile)
 		{
-
+			trace("Tile clicked");
 		}
 
 		public function addEntity(e:Entity)

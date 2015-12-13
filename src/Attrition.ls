@@ -7,6 +7,9 @@ package
 	import loom2d.textures.Texture;
 	import loom2d.textures.TextureSmoothing;
 	import loom2d.ui.SimpleLabel;
+	import loom2d.events.Touch;
+	import loom2d.events.TouchEvent;
+	import loom2d.events.TouchPhase;
 
 	public class Attrition extends Application
 	{
@@ -18,8 +21,11 @@ package
 		override public function run():void
 		{
 			stage.scaleMode = StageScaleMode.LETTERBOX;
+			this.stage.reportFps = true;
 
 			environment = new Environment(stage);
+
+			stage.addEventListener(TouchEvent.TOUCH, touchEvent);
 		}
 
 		override public function onTick()
@@ -33,6 +39,20 @@ package
 		{
 			environment.render();
 			return super.onFrame();
+		}
+
+		private function touchEvent(e:TouchEvent)
+		{
+			var touch:Touch = e.getTouch(stage, TouchPhase.ENDED);
+			if (touch == null)
+				touch = e.getTouch(stage, TouchPhase.BEGAN);
+			if (touch)
+			{
+				trace("brodcasting touch");
+				Environment.instance().iso.touchable = true;
+				Environment.instance().iso.broadcastEvent(new TouchEvent(e.type, e.touches, e.shiftKey, e.ctrlKey, false));
+				Environment.instance().iso.touchable = false;
+			}
 		}
 	}
 }
