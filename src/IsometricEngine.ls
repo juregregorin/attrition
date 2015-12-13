@@ -15,6 +15,11 @@
 
 			public function IsometricEngine()
 			{
+				this.touchable = false;
+			}
+
+			public function init()
+			{
 				baseLayer = new Sprite();
 				addChild(baseLayer);
 
