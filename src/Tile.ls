@@ -1,8 +1,14 @@
 package
 {
+	import system.Boolean;
+	import loom2d.math.Point;
+	import loom2d.display.DisplayObject;
 	import loom2d.display.DisplayObjectContainer;
 	import loom2d.display.Image;
 	import loom2d.textures.Texture;
+	import loom2d.events.Touch;
+	import loom2d.events.TouchEvent;
+	import loom2d.events.TouchPhase;
 
 	public enum TileType
 	{
@@ -93,6 +99,81 @@ package
 		}
 	}
 
+	public class TileImage extends Image
+	{
+		private var tile:Tile;
+		private var ignoretouch:Boolean;
+		public function TileImage(parent:Tile)
+		{
+			tile = parent;
+			addEventListener(TouchEvent.TOUCH, touchEvent);
+		}
+
+		static var __top = new Point();
+		static var __bottom = new Point();
+		static var __left = new Point();
+		static var __right = new Point();
+
+		static var __points:Vector.<Point> = null;
+
+		override public function hitTest(localPoint:Point, forTouch:Boolean):DisplayObject
+		{
+			// lol, hack
+			// don't know why
+			localPoint.y -= height - Tile.VIRTUAL_HEIGHT;
+
+			if (__points == null)
+			{
+				__points = new Vector.<Point>;
+				__points.push(__top);
+				__points.push(__left);
+				__points.push(__bottom);
+				__points.push(__right);
+			}
+
+			__top.x = width / 2;
+			__top.y = height + Tile.VIRTUAL_HEIGHT;
+			__bottom.x = width / 2;
+			__bottom.y = height;
+			__left.x = 0;
+			__left.y = height + Tile.VIRTUAL_HEIGHT / 2;
+			__right.x = Tile.VIRTUAL_WIDTH;
+			__right.y = height + Tile.VIRTUAL_HEIGHT / 2;
+
+			var i = 0;
+			var j = __points.length - 1;
+			var result:Boolean = false;
+
+			for (i = 0; i < __points.length; j = i++)
+			{
+				if ((__points[i].y > localPoint.y) != (__points[j].y > localPoint.y) &&
+					(localPoint.x < (__points[j].x - __points[i].x) * (localPoint.y - __points[i].y) / (__points[j].y - __points[i].y) + __points[i].x))
+					{
+						result = !result;
+					}
+			}
+
+			if (result)
+			{
+				return this;
+			}
+
+			return super.hitTest(localPoint, forTouch);
+		}
+
+		private function touchEvent(e:TouchEvent)
+		{
+			if (!touchable)
+				return;
+
+			var touch = e.getTouch(this, TouchPhase.ENDED);
+			if (touch)
+			{
+				Environment.instance().tileSelected(tile);
+			}
+		}
+	}
+
 	public class Tile
 	{
 		public static const VIRTUAL_WIDTH = 50;
@@ -104,7 +185,7 @@ package
 		private var _type:TileType;
 		private var _variant:Number;
 
-		private var _base:Image;
+		private var _base:TileImage;
 		private var _top:Image;
 
 		public function Tile(topLayer:DisplayObjectContainer, baseLayer:DisplayObjectContainer)
@@ -112,10 +193,11 @@ package
 			_population = 0;
 			_variant = Math.randomRangeInt(0, 1000);
 
-			_base = new Image();
+			_base = new TileImage(this);
 			baseLayer.addChild(_base);
 
 			_top = new Image();
+			_top.touchable = false;
 			topLayer.addChild(_top);
 		}
 
@@ -145,6 +227,8 @@ package
 		public function set water(value:Number)
 		{
 			_water = value;
+			if (water < 0)
+				water = 0;
 
 			if (_water < 0.25)
 			{
@@ -176,6 +260,8 @@ package
 			if (t == TileType.Bottom)
 			{
 				_top.visible = false;
+				_top.touchable = false;
+				_base.touchable = false;
 			}
 
 			updateTexture();

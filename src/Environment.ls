@@ -18,6 +18,7 @@ package
 		private var h:int;
 
 		private var background:Image;
+		private static var _instance:Environment;
 
 		private var ui:Sprite = new Sprite();
 
@@ -44,6 +45,8 @@ package
 
 		public function Environment(stage:Stage)
 		{
+			_instance = this;
+
 			this.w = Const.SCREEN_WIDTH;
 			this.h = Const.SCREEN_HEIGHT;
 			this.h = h;
@@ -95,12 +98,14 @@ package
 			fogFront.alpha = 0.5;
 			fogFront.width = 2844;
 			fogFront.height = 720;
+			fogFront.touchable = false;
 			stage.addChild(fogFront);
 			fogFront2 = new Image(Texture.fromAsset("assets/fog_top.png"));
 			fogFront2.alpha = 0.5;
 			fogFront2.width = 2844;
 			fogFront2.height = 720;
 			fogFront2.x += fogFront.width;
+			fogFront2.touchable = false;
 			stage.addChild(fogFront2);
 
 			stage.addChild(ui);
@@ -108,6 +113,16 @@ package
 
 			cards.x = stage.stageWidth -200;
 			cards.y = stage.nativeStageHeight - 50;
+		}
+
+		public static function instance():Environment
+		{
+			return _instance;
+		}
+
+		public function tileSelected(tile:Tile)
+		{
+
 		}
 
 		private function addEntity(e:Entity)
