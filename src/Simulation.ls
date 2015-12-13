@@ -46,7 +46,7 @@ package
 					{
 						settlements++;
 						// If odds be, increase local population
-						if (Math.randomRange(0, 1) <= Math.pow(t.population, -1.5) * lastFoodRatio && t.foodProduction - t.foodConsumption >= 0)
+						if (Math.randomRange(0, 1) <= Math.pow(t.population, -0.75) * lastFoodRatio && t.foodProduction - t.foodConsumption >= 0)
 						{
 							t.population += 1;
 						}

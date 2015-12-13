@@ -48,6 +48,7 @@ package
 			topTextureMap[TileType.Settlement].push(Texture.fromAsset("assets/tiles/settlement2.png"));
 			topTextureMap[TileType.Settlement].push(Texture.fromAsset("assets/tiles/settlement3.png"));
 			topTextureMap[TileType.Settlement].push(Texture.fromAsset("assets/tiles/settlement4.png"));
+			topTextureMap[TileType.Settlement].push(Texture.fromAsset("assets/tiles/settlement5.png"));
 			topTextureMap[TileType.Desert] = new Vector.<Texture>;
 			topTextureMap[TileType.Desert].push(Texture.fromAsset("assets/tiles/empty.png"));
 			topTextureMap[TileType.Arid] = new Vector.<Texture>;
@@ -75,7 +76,7 @@ package
 			return typeMap[variant % typeMap.length];
 		}
 
-		public static function getTopTexture(type:TileType, variant:Number):Texture
+		public static function getTopTexture(type:TileType, variant:Number, populationVariant:Number):Texture
 		{
 			if (topTextureMap == null)
 			{
@@ -84,7 +85,11 @@ package
 
 			var typeMap:Vector.<Texture> = topTextureMap[type];
 
-			return typeMap[variant % typeMap.length];
+			var v = populationVariant;
+			if (v == -1)
+				v = variant;
+
+			return typeMap[v % typeMap.length];
 		}
 	}
 
@@ -190,11 +195,33 @@ package
 		{
 			if (_population == 0)
 			{
-				_top.texture = TileTextures.getTopTexture(_type, _variant);
+				_top.texture = TileTextures.getTopTexture(_type, _variant, -1);
 			}
 			else
 			{
-				_top.texture = TileTextures.getTopTexture(TileType.Settlement, _variant);
+				var pv:Number;
+				if (population <= 2)
+				{
+					pv = 0;
+				}
+				else if (population <= 5)
+				{
+					pv = 1;
+				}
+				else if (population <= 10)
+				{
+					pv = 2;
+				}
+				else if (population <= 15)
+				{
+					pv = 3;
+				}
+				else
+				{
+					pv = 4;
+				}
+
+				_top.texture = TileTextures.getTopTexture(TileType.Settlement, _variant, pv);
 			}
 
 		}
