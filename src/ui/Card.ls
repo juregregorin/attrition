@@ -16,21 +16,37 @@ package ui
 	{
 		private static var STATE_HOVER:String = "hover";
 		private static var STATE_USED:String = "used";
+		private static var STATE_SELECTED:String = "selected";
+		private static var STATE_DRAWING:String = "in_draw";
+		private static var STATE_IN_DECK:String = "in_deck";
 
 		private static var CARDS:Vector.<Card> = new Vector.<Card>();
 		private static var TWEENS:Vector.<Tween> = new Vector.<Tween>();
 		private static var CARD_LOCATIONS:Vector.<Point> = new Vector.<Point>();
 		private static var MAX_CARDS:int = 3;
 
+		private static var CARD_DECK:Vector.<Card> = new Vector.<Card>();
+
+		private static var SELECTED_CARD:Card = null;
+
 		public static var TYPE_RAIN:String = "rain";
 		public static var TYPE_FOOD:String = "food";
+		public static var TYPE_MEDITATE:String = "meditate";
+		public static var TYPE_HEAL:String = "heal";
 
 		private static var cardFace:Texture;
 		private static var cardImages:Vector.<Image>;
 
 		private static var tweenTime:Number = 1;
 
+		private static var drawTween:Tween;
+
 		private var img:ImageCard;
+
+		private var cardName:String = "";
+		private var manaCost:uint = 0;
+		private var spellIntensity:Number = 0;
+		private var spellDescription:String = "";
 
 		public function Card()
 		{
@@ -38,8 +54,18 @@ package ui
 				cardFace = Texture.fromAsset("assets/card-face.png");
 
 			if (cardImages == null)
-			{
 				cardImages = new Vector.<Image>();
+
+			if (drawTween == null)
+			{
+				drawTween = new Tween(this, tweenTime, Transitions.EASE_IN);
+				drawTween.animate("x", x);
+				drawTween.animate("y", y);
+				drawTween.animate("rotation", rotation);
+			}
+			else
+			{
+				drawTween.reset(img, tweenTime, Transitions.EASE_IN);
 			}
 
 			img = new ImageCard(cardFace);
@@ -61,6 +87,11 @@ package ui
 
 		override public function render()
 		{
+			if (state == STATE_IN_DECK)
+				img.alpha = 0;
+			else
+				img.alpha = 1;
+
 			img.x = x;
 			img.y = y;
 			img.rotation = rotation;
@@ -70,9 +101,110 @@ package ui
 
 		override public function tick(dt:Number)
 		{
-
-
 			super.tick(dt);
+		}
+
+		public function generateCard(type:String = "")
+		{
+			if (type.length == 0)
+				switch(Math.randomRangeInt(0,3))
+				{
+					case 0:
+						type = TYPE_FOOD;
+						break;
+					case 1:
+						type = TYPE_MEDITATE;
+						break;
+					case 2:
+						type = TYPE_RAIN;
+						break;
+					case 3:
+						type = TYPE_HEAL;
+						break;
+				}
+
+			switch (type)
+			{
+				case TYPE_FOOD:
+					cardName = "Plentiful Harvest";
+					manaCost = Math.randomRangeInt(1, 6);
+					spellIntensity = 5 * manaCost;
+					spellDescription = "Increase food production in target area by " + spellIntensity + " percent.";
+					break;
+				case TYPE_MEDITATE:
+					cardName = "Meditate";
+					manaCost = 0;
+					spellIntensity = 0;
+					spellDescription = "Increase aether regeneration. Cannot cast spells until aether is fully regenerated.";
+					break;
+				case TYPE_RAIN:
+					cardName = "Downpour";
+					manaCost = Math.randomRangeInt(1, 10);
+					spellIntensity = 5 * manaCost;
+					spellDescription = "Restore " + spellIntensity + " percent of water to tiles in target area.";
+					break;
+				case TYPE_HEAL:
+					cardName = "Divine Remedy";
+					manaCost = Math.randomRangeInt(3, 10);
+					spellIntensity = 5 * (manaCost-3);
+					spellDescription = "Heal population by " + spellIntensity + " percent and/or remove pleague in target area.";
+					break;
+			}
+		}
+
+		public static function newCard()
+		{
+			var c = new Card();
+
+			c.state = STATE_IN_DECK;
+			c.render();
+			c.x = -environment.getCardUI().x + 1280 / 2;
+			c.y = -environment.getCardUI().y - cardFace.height;
+
+			c.generateCard();
+
+			CARD_DECK.push(c);
+		}
+
+		public static function drawCard()
+		{
+			if (CARD_DECK.length == 0) return;
+
+			var c = CARD_DECK[0];
+			if (c.state != STATE_IN_DECK) return;
+			c.state = STATE_DRAWING;
+
+			environment.addEntity(c);
+
+			Loom2D.juggler.remove(drawTween);
+			drawTween.reset(c, tweenTime, Transitions.EASE_IN_OUT);
+			drawTween.animate("x", -environment.getCardUI().x + (1280 / 2));
+			drawTween.animate("y", -environment.getCardUI().y +  (720 / 2));
+			drawTween.onComplete = takeCard;
+			drawTween.onCompleteArgs = [c];
+			Loom2D.juggler.add(drawTween);
+		}
+
+		public static function takeCard(c:Card)
+		{
+			CARD_DECK.remove(c);
+			CARDS.push(c);
+			var t = new Tween(c, tweenTime, Transitions.EASE_OUT);
+			TWEENS.push(t);
+			CARD_LOCATIONS.push(Point.ZERO);
+			c.state = STATE_IDLE;
+			sortCards();
+			smartSort();
+		}
+
+		public static function handIsFull():Boolean
+		{
+			return CARDS.length >= MAX_CARDS;
+		}
+
+		public static function deckIsEmpty():Boolean
+		{
+			return CARD_DECK.length == 0;
 		}
 
 		public static function addCard(cardType:String):Card
@@ -89,7 +221,7 @@ package ui
 			c.y = -200;
 
 			sortCards();
-			defaultSort();
+			smartSort();
 
 			return c;
 		}
@@ -104,17 +236,23 @@ package ui
 			switch (CARDS.length)
 			{
 				case 1:
-					animateCard(CARDS[0], TWEENS[0], 0, -20, 0);
+					if (CARDS[0].state != STATE_SELECTED && CARDS[0].state != STATE_DRAWING && CARDS[0].state != STATE_IN_DECK)
+						animateCard(CARDS[0], TWEENS[0], 0, -20, 0);
 					break;
 				case 2:
-					animateCard(CARDS[0], TWEENS[0], -30, 0, -Math.PI/15);
-					animateCard(CARDS[1], TWEENS[1],  30, 0,  Math.PI/15);
+					if (CARDS[0].state != STATE_SELECTED && CARDS[0].state != STATE_DRAWING && CARDS[0].state != STATE_IN_DECK)
+						animateCard(CARDS[0], TWEENS[0], -30, 0, -Math.PI/15);
+					if (CARDS[1].state != STATE_SELECTED && CARDS[0].state != STATE_DRAWING && CARDS[1].state != STATE_IN_DECK)
+						animateCard(CARDS[1], TWEENS[1],  30, 0,  Math.PI/15);
 
 					break;
 				case 3:
-					animateCard(CARDS[0], TWEENS[0], -90,   0, -Math.PI/10);
-					animateCard(CARDS[1], TWEENS[1],   0, -20,  0);
-					animateCard(CARDS[2], TWEENS[2],  90,   0,  Math.PI/10);
+					if (CARDS[0].state != STATE_SELECTED && CARDS[0].state != STATE_DRAWING && CARDS[0].state != STATE_IN_DECK)
+						animateCard(CARDS[0], TWEENS[0], -90,   0, -Math.PI/10);
+					if (CARDS[1].state != STATE_SELECTED && CARDS[1].state != STATE_DRAWING && CARDS[1].state != STATE_IN_DECK)
+						animateCard(CARDS[1], TWEENS[1],   0, -20,  0);
+					if (CARDS[2].state != STATE_SELECTED && CARDS[2].state != STATE_DRAWING && CARDS[2].state != STATE_IN_DECK)
+						animateCard(CARDS[2], TWEENS[2],  90,   0,  Math.PI/10);
 
 					break;
 			}
@@ -140,6 +278,11 @@ package ui
 			return CARDS.length;
 		}
 
+		public function deselect()
+		{
+			state = STATE_IDLE;
+		}
+
 		private function clean()
 		{
 			for (var i = 0; i < CARDS.length; i++)
@@ -153,32 +296,68 @@ package ui
 
 		private function touchEvent(e:TouchEvent)
 		{
-			// Hover
-			var touch = e.getTouch(img, TouchPhase.HOVER);
+			if (state == STATE_IN_DECK || state == STATE_DRAWING) return;
+			var touch:Touch = null;
+
+			// Click
+			touch = e.getTouch(img, TouchPhase.BEGAN);
 			if (touch)
 			{
-				//state = Entity.STATE_IDLE;
-				if (state != STATE_HOVER)
+				if (state == STATE_SELECTED)
+				{
+					state = STATE_HOVER;
+					SELECTED_CARD = null;
+				}
+				else
+				{
+					clearSelection();
+					state = STATE_SELECTED;
+					SELECTED_CARD = this;
+					sortCards();
+				}
+
+				return;
+			}
+
+			// Hover
+			touch = e.getTouch(img, TouchPhase.HOVER);
+			if (touch)
+			{
+				if (state == STATE_IDLE)
 				{
 					state = STATE_HOVER;
 					animateCard(this, getTween(this), this.x, -50, 0);
-					img.setDepth(-1);
+					smartSort();
 					environment.getCardUI().sortChildren(ImageCard.zSort);
 				}
-			} else {
+			} else if (state != STATE_SELECTED) {
 				state = STATE_IDLE;
 				sortCards();
-				defaultSort();
+				smartSort();
 			}
 		}
 
-		private static function defaultSort()
+		private static function smartSort()
 		{
 			for (var i = 0; i < CARDS.length; i++)
 			{
-				CARDS[i].getImg().setDepth(i);
+				if (CARDS[i].state == STATE_SELECTED)
+					CARDS[i].getImg().setDepth(-1);
+				else if (CARDS[i].state == STATE_HOVER)
+					CARDS[i].getImg().setDepth(-2);
+				else
+					CARDS[i].getImg().setDepth(i);
 			}
 			environment.getCardUI().sortChildren(ImageCard.zSort);
+		}
+
+		private static function clearSelection()
+		{
+			for (var i = 0; i < CARDS.length; i++)
+			{
+				CARDS[i].deselect();
+			}
+			SELECTED_CARD = null;
 		}
 
 		private function getTween(c:Card):Tween
@@ -193,6 +372,11 @@ package ui
 		private function getImg():ImageCard
 		{
 			return img;
+		}
+
+		public function toString():String
+		{
+			return "[Card state='"+state+"', cardName='"+cardName+"', cardDescription='"+spellDescription+"']";
 		}
 	}
 
