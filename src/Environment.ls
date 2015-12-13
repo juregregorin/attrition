@@ -133,15 +133,15 @@ package
 
 			testProgress.progress = testProgress.progress >= 1 ? testProgress.progress - 1 : testProgress.progress + dt;
 
-			fogFront.x -= dt * 5;
-			fogFront2.x -= dt * 5;
+			fogFront.x -= dt * 10;
+			fogFront2.x -= dt * 10;
 			if (fogFront.x + fogFront.width <= 0)
 				fogFront.x += fogFront.width * 2;
 			if (fogFront2.x + fogFront2.width <= 0)
 				fogFront2.x += fogFront2.width * 2;
 
-			fogBack.x += dt * 5;
-			fogBack2.x += dt * 5;
+			fogBack.x += dt * 10;
+			fogBack2.x += dt * 10;
 			if (fogBack.x >= Const.SCREEN_WIDTH)
 				fogBack.x -= fogBack.width * 2;
 			if (fogBack2.x >= Const.SCREEN_WIDTH)
