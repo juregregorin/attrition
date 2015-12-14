@@ -129,7 +129,7 @@ package ui
 			dg.clear();
 			// Description
 			dg.textFormat(FORMAT_DESCRIPTION);
-			dg.drawTextBox( 0, 0, 430, description); // -200, 90, 400
+			dg.drawTextBox( 0, 0, 420, description); // -200, 90, 400
 			cardDescription.x = -cardDescription.width / 2;
 			cardDescription.y = 100; // - cardDescription.height;
 		}

@@ -203,7 +203,10 @@ package
 		private var _base:TileImage;
 		private var _top:Image;
 
-		public function Tile(topLayer:DisplayObjectContainer, baseLayer:DisplayObjectContainer)
+		private var _logx:Number;
+		private var _logy:Number;
+
+		public function Tile(topLayer:DisplayObjectContainer, baseLayer:DisplayObjectContainer, logx:Number, logy:Number)
 		{
 			_population = 0;
 			_variant = Math.randomRangeInt(0, 1000);
@@ -214,6 +217,9 @@ package
 			_top = new Image();
 			_top.touchable = false;
 			topLayer.addChild(_top);
+
+			_logx = logx;
+			_logy = logy;
 		}
 
 		public function get population():Number
@@ -244,6 +250,8 @@ package
 			_water = value;
 			if (water < 0)
 				water = 0;
+			if (water > 1)
+				water = 1;
 
 			if (_water < 0.25)
 			{
@@ -379,6 +387,16 @@ package
 		public function get y():Number
 		{
 			return _base.y;
+		}
+
+		public function get logx():Number
+		{
+			return _logx;
+		}
+
+		public function get logy():Number
+		{
+			return _logy;
 		}
 	}
 }
