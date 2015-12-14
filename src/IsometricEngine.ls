@@ -38,7 +38,7 @@
 
 					for (var j = 0; j < Const.NUM_TILES; j++)
 					{
-						var t:Tile = new Tile(topLayer,  baseLayer);
+						var t:Tile = new Tile(topLayer,  baseLayer, i, j);
 
 						t.water = pn.GetRandomHeight(i, j, 1, 0.33, 0.6, 0.5, 0.5);
 						t.x = startX + (i * Tile.VIRTUAL_WIDTH / 2) + (j * -Tile.VIRTUAL_WIDTH / 2 );
@@ -70,7 +70,7 @@
 
 				for (i = 0; i < Const.NUM_TILES; i++)
 				{
-					t = new Tile(topLayer, baseLayer);
+					t = new Tile(topLayer, baseLayer, i, 0);
 					t.x = startX + (i * Tile.VIRTUAL_WIDTH / 2) + ((Const.NUM_TILES - 1) * -Tile.VIRTUAL_WIDTH / 2 );
 					t.y = startY + (i * Tile.VIRTUAL_HEIGHT / 2) + ((Const.NUM_TILES - 1) * Tile.VIRTUAL_HEIGHT / 2) + 46;
 					t.type = TileType.Bottom;
@@ -81,7 +81,7 @@
 
 				for (i = 0; i < Const.NUM_TILES; i++)
 				{
-					t = new Tile(topLayer, baseLayer);
+					t = new Tile(topLayer, baseLayer, i, 0);
 					t.x = startX + ((Const.NUM_TILES - 1) * Tile.VIRTUAL_WIDTH / 2) + (i * -Tile.VIRTUAL_WIDTH / 2 );
 					t.y = startY + ((Const.NUM_TILES - 1) * Tile.VIRTUAL_HEIGHT / 2) + (i * Tile.VIRTUAL_HEIGHT / 2) + 46;
 					t.type = TileType.Bottom;

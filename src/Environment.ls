@@ -50,6 +50,10 @@ package
 		private var cardTreshold:Number = 2;
 
 		private var cardGetter:Sprite;
+		private var cardPlayer:Sprite;
+
+		private var selectedSpell:Card = null;
+		private var targetingMode:Boolean = false;
 
 		public function Environment(stage:Stage)
 		{
@@ -88,7 +92,17 @@ package
 			ui.addChild(cardGetter);
 			cardGetter.addEventListener(TouchEvent.TOUCH, touchEvent);
 
+			cardPlayer = new Sprite();
+			var cp = new Image(Texture.fromAsset("assets/play-card.png"));
+			cp.center();
+			cardPlayer.addChild(cp);
+			cardPlayer.x = cardPlayer.width * 2;
+			cardPlayer.y = stage.stageHeight - cardPlayer.height / 2;
+			ui.addChild(cardPlayer);
+			cardPlayer.addEventListener(TouchEvent.TOUCH, touchEvent);
+
 			tempStats = new TextUI(3);
+			tempStats.rowOffset = -10;
 
 			testProgress = new ProgressUI();
 
@@ -143,14 +157,68 @@ package
 			return _instance;
 		}
 
+		public function pickCard(c:Card)
+		{
+			if (c == null) return;
+			selectedSpell = c;
+			if (selectedSpell.target == Card.TARGET_SELF || selectedSpell.target == Card.TARGET_ALL)
+				useCard();
+		}
+
+		public function useCard()
+		{
+			if (selectedSpell == null) return;
+
+			switch(selectedSpell.type)
+			{
+				case Card.TYPE_MEDITATE:
+					addLog("Meditate", TextUI.COLOR_POSITIVE);
+					break;
+				case Card.TYPE_RAIN:
+					addLog("Downpour", TextUI.COLOR_POSITIVE);
+					break;
+				case Card.TYPE_FOOD:
+					addLog("Plentiful Harvest", TextUI.COLOR_POSITIVE);
+					break;
+				case Card.TYPE_HEAL:
+					addLog("Divine Remedy", TextUI.COLOR_POSITIVE);
+					break;
+			}
+
+			selectedSpell.destroy();
+
+			selectedSpell = null;
+		}
+
 		public function tileSelected(tile:Tile)
 		{
-			trace("Tile clicked");
+			if (selectedSpell == null && !targetingMode) return;
+
+			var t:Vector.<Tile> = new Vector.<Tile>();
+			t.push(tile);
+			t = t.concat(simulation.getNeighbours(tile.logx, tile.logy));
+
+			for (var i = 0; i < t.length; i++) {
+				switch (selectedSpell.type)
+				{
+					case Card.TYPE_RAIN:
+						t[i].water += selectedSpell.intensity / 100;
+						addLog(t[i].water + "");
+						break;
+				}
+			}
+
+			useCard();
 		}
 
 		public function addEntity(e:Entity)
 		{
 			entities.push(e);
+		}
+
+		public function removeEntity(e:Entity)
+		{
+			entities.remove(e);
 		}
 
 		public function tick(dt:Number)
@@ -229,6 +297,13 @@ package
 			if (touch)
 			{
 				Card.newCard();
+			}
+
+			touch = e.getTouch(cardPlayer, TouchPhase.BEGAN);
+			if (touch)
+			{
+				if (selectedSpell == null)
+					pickCard(Card.selectedCard());
 			}
 		}
 	}

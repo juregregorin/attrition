@@ -34,6 +34,11 @@ package ui
 		public static var TYPE_MEDITATE:String = "meditate";
 		public static var TYPE_HEAL:String = "heal";
 
+		public static var TARGET_SELF:String = "self";
+		public static var TARGET_AREA:String = "area";
+		public static var TARGET_ALL:String = "all";
+		public static var TARGET_SINGLE:String = "single";
+
 		private static var cardImages:Vector.<Image>;
 
 		private static var tweenTime:Number = 1;
@@ -47,6 +52,7 @@ package ui
 		private var manaCost:uint = 0;
 		private var spellIntensity:Number = 0;
 		private var spellDescription:String = "";
+		private var targetEffect:String = "";
 
 		private static var minScale:Number = 0.28;
 		private static var maxScale:Number = 0.70;
@@ -84,15 +90,44 @@ package ui
 			cardBase.addEventListener(TouchEvent.TOUCH, touchEvent);
 		}
 
+
+		public function get type():String
+		{
+			return cardType;
+		}
+
+		public function get name():String
+		{
+			return cardName;
+		}
+
+		public function get cost():uint
+		{
+			return manaCost;
+		}
+
+		public function get intensity():Number
+		{
+			return spellIntensity;
+		}
+
+		public function get target():String
+		{
+			return targetEffect;
+		}
+
 		override public function destroy()
 		{
+			state = STATE_DESTROYED;
 			environment.getUI().removeChild(cardBase);
+			environment.removeEntity(this);
 			cardBase.destroy();
 			cardBase = null;
 
 			super.destroy();
 
 			clean();
+			sortCards();
 		}
 
 		override public function render()
@@ -142,31 +177,35 @@ package ui
 					manaCost = Math.randomRangeInt(1, 6);
 					spellIntensity = 5 * manaCost;
 					spellDescription = "Increase food production in target area by *" + spellIntensity + "* percent.";
+					targetEffect = TARGET_AREA;
 					break;
 				case TYPE_MEDITATE:
 					cardName = "Meditate";
 					manaCost = 0;
 					spellIntensity = 0;
 					spellDescription = "Increase aether regeneration. Cannot cast spells until aether is fully regenerated.";
+					targetEffect = TARGET_SELF;
 					break;
 				case TYPE_RAIN:
 					cardName = "Downpour";
 					manaCost = Math.randomRangeInt(1, 10);
 					spellIntensity = 5 * manaCost;
 					spellDescription = "Restore *" + spellIntensity + "* percent of water to tiles in target area.";
+					targetEffect = TARGET_AREA;
 					break;
 				case TYPE_HEAL:
 					cardName = "Divine Remedy";
 					manaCost = Math.randomRangeInt(3, 10);
 					spellIntensity = 5 * (manaCost);
 					spellDescription = "Heal population by *" + spellIntensity + "* percent and/or remove plague in target area.";
+					targetEffect = TARGET_AREA;
 					break;
 			}
 		}
 
 		public static function newCard()
 		{
-			var c = new Card();
+			var c = new Card(TYPE_RAIN);
 
 			c.state = STATE_IN_DECK;
 			c.render();
@@ -281,7 +320,8 @@ package ui
 
 		public function use()
 		{
-			this.destroy();
+			environment.getCardUI().removeChild(cardBase);
+			environment.removeEntity(this);
 		}
 
 		public function numCards():int
@@ -383,6 +423,18 @@ package ui
 		private function getImg():ImageCard
 		{
 			return cardBase;
+		}
+
+		public static function selectedCard():Card
+		{
+			for (var i = 0; i < CARDS.length; i++)
+			{
+				if (CARDS[i].state == STATE_SELECTED)
+				{
+					return CARDS[i];
+				}
+			}
+			return null;
 		}
 
 		public function toString():String

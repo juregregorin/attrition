@@ -21,6 +21,8 @@ package ui
 		protected var textColors:Vector.<uint>;
 		protected var textLines:uint;
 
+		private var _rowOffset:Number = 0;
+
 		public function TextUI(textLines:uint = 5, color:uint = 0xFFFFFF)
 		{
 			textDisplay = new Vector.<String>();
@@ -36,7 +38,7 @@ package ui
 			_format = new TextFormat();
 			_format.font = "dungeon";
 			_format.color = color;
-			_format.size = 12;
+			_format.size = 30;
 			_format.align = TextAlign.TOP | TextAlign.LEFT;
 		}
 
@@ -67,8 +69,13 @@ package ui
 			{
 				_format.color = textColors[i];
 				g.textFormat(_format);
-				g.drawTextLine(0, i * _format.size, textDisplay[i]);
+				g.drawTextLine(0, i * (_format.size + _rowOffset), textDisplay[i]);
 			}
+		}
+
+		public function set rowOffset(offset:int = 0)
+		{
+			_rowOffset = offset;
 		}
 
 		public override function render()
