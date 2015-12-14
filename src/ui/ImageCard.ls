@@ -85,7 +85,7 @@ package ui
 		private function generateGraphics()
 		{
 			if (cardRain == null)
-				cardRain = Texture.fromAsset("assets/cards/card-harvest.png");
+				cardRain = Texture.fromAsset("assets/cards/card-downpour.png");
 			if (cardFood == null)
 				cardFood = Texture.fromAsset("assets/cards/card-harvest.png");
 			if (cardMeditate == null)
