@@ -33,8 +33,6 @@ package
 
 		private var logText:TextUI;
 
-		private var tempStats:TextUI;
-
 		private var testProgress:ProgressUI;
 		private var cards:Sprite;
 
@@ -53,6 +51,7 @@ package
 
 		private var selectedSpell:Card = null;
 		private var targetingMode:Boolean = false;
+		private var canPlaySpells:Boolean = true;
 
 		private var isGameOver = false;
 
@@ -83,9 +82,10 @@ package
 			fogBack2.x = fogBack.width;
 			stage.addChild(fogBack2);
 
-			logText = new TextUI(15);
+			logText = new TextUI(10);
+			logText.rowOffset = -10;
 			logText.x = 5;
-			logText.y = stage.stageHeight - (15 * logText.format.size + 5);
+			logText.y = stage.stageHeight - (15 * (logText.format.size - 10) + 5);
 
 			cardPlayer = new Sprite();
 			var cp = new Image(Texture.fromAsset("assets/play-card.png"));
@@ -95,9 +95,6 @@ package
 			cardPlayer.y = stage.stageHeight - cardPlayer.height / 2;
 			ui.addChild(cardPlayer);
 			cardPlayer.addEventListener(TouchEvent.TOUCH, touchEvent);
-
-			tempStats = new TextUI(3);
-			tempStats.rowOffset = -10;
 
 			testProgress = new ProgressUI();
 
@@ -249,6 +246,7 @@ package
 			if (!Card.handIsFull() && !Card.deckIsEmpty())
 			{
 				Card.drawCard();
+				cardTimer.resetTimer();
 			}
 
 			testProgress.progress = testProgress.progress >= 1 ? testProgress.progress - 1 : testProgress.progress + dt;
@@ -258,9 +256,20 @@ package
 
 		public function render()
 		{
-			tempStats.setText("Current population: " + simulation.currentPopulation, TextUI.COLOR_POSITIVE);
-			tempStats.setText("Current food: " + simulation.currentFood, TextUI.COLOR_NEGATIVE);
-			tempStats.setText("Food trend: " + simulation.foodTrend);
+			//trace("Food trend: " + simulation.foodTrend);
+
+			statBar.food = simulation.currentFood;
+			statBar.foodRate = simulation.foodTrend;
+			statBar.population = simulation.currentPopulation;
+
+			if (Card.selectedCard() != null)
+			{
+				cardPlayer.visible = true;
+			}
+			else
+			{
+				cardPlayer.visible = false;
+			}
 
 			for (var i:int = 0; i < entities.length; i++)
 			{
@@ -291,14 +300,7 @@ package
 
 		private function touchEvent(e:TouchEvent)
 		{
-			var touch:Touch = e.getTouch(cardTimer.touchableObject, TouchPhase.BEGAN);
-			if (touch && cardTimer.canDraw())
-			{
-				Card.newCard();
-				cardTimer.resetTimer();
-			}
-
-			touch = e.getTouch(cardPlayer, TouchPhase.BEGAN);
+			var touch:Touch = e.getTouch(cardPlayer, TouchPhase.BEGAN);
 			if (touch)
 			{
 				if (selectedSpell == null)

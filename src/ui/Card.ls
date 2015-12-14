@@ -211,6 +211,7 @@ package ui
 			c.render();
 			c.x = -environment.getCardUI().x + 1280 / 2;
 			c.y = -environment.getCardUI().y - c.cardBase.height;
+			c.scale = minScale;
 
 			CARD_DECK.push(c);
 		}
@@ -349,6 +350,8 @@ package ui
 		{
 			if (state == STATE_IN_DECK || state == STATE_DRAWING) return;
 			var touch:Touch = null;
+
+			if (environment.isTargeting()) return;
 
 			// Click
 			touch = e.getTouch(cardBase, TouchPhase.BEGAN);
