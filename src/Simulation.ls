@@ -1,7 +1,14 @@
 package
 {
 	import loom.sound.SimpleAudioEngine;
+	import loom.sound.Sound;
 	import TileType;
+
+	public enum SoundType
+	{
+		Build,
+		Death
+	}
 
 	public class Simulation
 	{
@@ -14,6 +21,21 @@ package
 		private var lastFoodRatio = 1;
 
 		private var audio:SimpleAudioEngine;
+		private var currentSound:Sound;
+		private var timeSinceLastSound:Number = 0;
+		private var lastSoundType:SoundType;
+
+		private function playEffect(path:String, type:SoundType):void
+		{
+			if ((currentSound == null || !currentSound.isPlaying()) &&
+				(lastSoundType == null || (lastSoundType == type && timeSinceLastSound > 10) || lastSoundType != type))
+			{
+				var id = audio.playEffect(path, false);
+				currentSound = audio.getSoundById(id);
+				timeSinceLastSound = 0;
+				lastSoundType = type;
+			}
+		}
 
 		public function Simulation()
 		{
@@ -24,6 +46,7 @@ package
 		public function tick(dt:Number):void
 		{
 			elapsedTime += dt;
+			timeSinceLastSound += dt;
 			if (elapsedTime >= SIMULATION_TICK_TIME)
 			{
 				elapsedTime -= SIMULATION_TICK_TIME;
@@ -33,8 +56,6 @@ package
 
 		public function simulationTick():void
 		{
-			var playedSound = false;
-
 			foodBalance = 0;
 			var settlements = 0;
 			for (var i = 0; i < Const.NUM_TILES; i++)
@@ -67,11 +88,7 @@ package
 										tt.population = 1;
 										settlements++;
 
-										if (!playedSound)
-										{
-											audio.playEffect("assets/sounds/build.ogg");
-											playedSound = true;
-										}
+										playEffect("assets/sounds/build.ogg", SoundType.Build);
 									}
 								}
 							}
@@ -92,16 +109,12 @@ package
 			else
 				foodStatus += 1;
 
-			if (foodStatus < 0)
+			if (foodStatus < 0 && currentPopulation > 0)
 			{
 				turnsStarving++;
 				turnsStarving = Math.clamp(turnsStarving, 0, 10);
 				settlements -= starve(turnsStarving);
-				if (!playedSound)
-				{
-					audio.playEffect(Math.randomRangeInt(0, 1) ? "assets/sounds/death1.ogg" : "assets/sounds/death2.ogg");
-					playedSound = true;
-				}
+				playEffect(Math.randomRangeInt(0, 1) ? "assets/sounds/death1.ogg" : "assets/sounds/death2.ogg", SoundType.Death);
 				foodStatus = 0;
 			}
 			else
