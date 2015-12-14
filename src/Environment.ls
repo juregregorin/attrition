@@ -11,6 +11,7 @@ package
 	import loom2d.events.TouchPhase;
 	import loom2d.textures.Texture;
 	import ui.Card;
+	import ui.CardTimer;
 	import ui.StatBar;
 	import ui.ProgressUI;
 	import ui.TextUI;
@@ -45,8 +46,7 @@ package
 
 		private var statBar:StatBar;
 
-		private var cardTimer:Number = 0;
-		private var cardTreshold:Number = 2;
+		private var cardTimer:CardTimer;
 
 		private var cardGetter:Sprite;
 		private var cardPlayer:Sprite;
@@ -83,14 +83,6 @@ package
 			logText.x = 5;
 			logText.y = stage.stageHeight - (15 * logText.format.size + 5);
 
-			cardGetter = new Sprite();
-			var cg = new Image(Texture.fromAsset("assets/card-getter.png"));
-			cg.center();
-			cardGetter.addChild(cg);
-			cardGetter.x = stage.stageWidth / 2;
-			ui.addChild(cardGetter);
-			cardGetter.addEventListener(TouchEvent.TOUCH, touchEvent);
-
 			cardPlayer = new Sprite();
 			var cp = new Image(Texture.fromAsset("assets/play-card.png"));
 			cp.center();
@@ -111,14 +103,6 @@ package
 
 			statBar = new StatBar();
 			ui.addChild(statBar);
-
-			/*manaDisplay = new TextUI(1);
-			manaDisplay.setPosition(statBar.x - 150, 22);
-			var manaF:TextFormat = manaDisplay.format;
-			manaF.align = TextAlign.RIGHT;
-			manaF.size = 20;
-			manaDisplay.format = manaF;
-			addEntity(manaDisplay);*/
 
 			simulation = new Simulation();
 
@@ -146,8 +130,13 @@ package
 			fogFront2.touchable = false;
 			stage.addChild(fogFront2);
 
-			stage.addChild(ui);
 			stage.addChild(cards);
+			stage.addChild(ui);
+
+			cardTimer = new CardTimer();
+			cardTimer.x = 1280 / 2;
+			cardTimer.y = cardTimer.height / 2;
+			cardTimer.touchableObject.addEventListener(TouchEvent.TOUCH, touchEvent);
 		}
 
 		public static function instance():Environment
@@ -159,6 +148,8 @@ package
 		{
 			if (c == null) return;
 			selectedSpell = c;
+			if (selectedSpell.target == Card.TARGET_AREA)
+				targetingMode = true;
 			if (selectedSpell.target == Card.TARGET_SELF || selectedSpell.target == Card.TARGET_ALL)
 				useCard();
 		}
@@ -186,6 +177,7 @@ package
 			selectedSpell.destroy();
 
 			selectedSpell = null;
+			targetingMode = false;
 		}
 
 		public function tileSelected(tile:Tile)
@@ -232,14 +224,6 @@ package
 				Card.drawCard();
 			}
 
-			/*if (cardTimer > cardTreshold)
-			{
-				cardTimer -= cardTreshold;
-				var c = Card.addCard(Card.TYPE_RAIN);
-				if (c != null) addEntity(c);
-			}
-			cardTimer += dt;*/
-
 			testProgress.progress = testProgress.progress >= 1 ? testProgress.progress - 1 : testProgress.progress + dt;
 
 			fogFront.x -= dt * 10;
@@ -272,6 +256,11 @@ package
 			}
 		}
 
+		public function isTargeting():Boolean
+		{
+			return targetingMode;
+		}
+
 		public function getUI():Sprite
 		{
 			return ui;
@@ -289,10 +278,11 @@ package
 
 		private function touchEvent(e:TouchEvent)
 		{
-			var touch:Touch = e.getTouch(cardGetter, TouchPhase.BEGAN);
-			if (touch)
+			var touch:Touch = e.getTouch(cardTimer.touchableObject, TouchPhase.BEGAN);
+			if (touch && cardTimer.canDraw())
 			{
 				Card.newCard();
+				cardTimer.resetTimer();
 			}
 
 			touch = e.getTouch(cardPlayer, TouchPhase.BEGAN);

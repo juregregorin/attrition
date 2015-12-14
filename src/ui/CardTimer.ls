@@ -1,5 +1,6 @@
 package ui
 {
+	import loom2d.display.DisplayObject;
 	import loom2d.display.Graphics;
 	import loom2d.display.Shape;
 	import loom2d.display.Image;
@@ -11,6 +12,8 @@ package ui
 
 	public class CardTimer extends Entity
 	{
+		public static var STATE_CARD_READY:String = "card_ready";
+
 		private var wings:Image;
 		private var disc:Image;
 		private var glow:Image;
@@ -18,10 +21,13 @@ package ui
 		private var holder:Sprite;
 
 		private var cardTimer:Number = 0;
-		private var cardInterval:Number = 20;
+		private var cardInterval:Number = 5;
 
 		private var timerDisplay:Shape;
 		private var g:Graphics;
+
+		private var glowMaxAlpha:Number = .7;
+		private var glowTime:Number = 0;
 
 		private var format:TextFormat;
 
@@ -33,14 +39,16 @@ package ui
 			wings.center();
 			holder.addChild(wings);
 
-			glow = new Image(Texture.fromAsset("assets/ui/glow.png"));
-			glow.center();
-			glow.scale = 1.5;
-			holder.addChild(glow);
-
 			disc = new Image(Texture.fromAsset("assets/ui/disc.png"));
 			disc.center();
 			holder.addChild(disc);
+
+			glow = new Image(Texture.fromAsset("assets/ui/glow.png"));
+			glow.center();
+			glow.scale = 2.5;
+			glow.y = -26.5;
+			glow.alpha = glowMaxAlpha;
+			holder.addChild(glow);
 
 			timerDisplay = new Shape();
 			g = timerDisplay.graphics;
@@ -71,6 +79,13 @@ package ui
 		public function resetTimer()
 		{
 			cardTimer = 0;
+			state = STATE_IDLE;
+			glowTime = 0;
+		}
+
+		public function canDraw():Boolean
+		{
+			return state == STATE_CARD_READY;
 		}
 
 		override public function render()
@@ -80,21 +95,43 @@ package ui
 			//holder.rotation = rotation;
 
 			g.clear();
-			g.textFormat(format);
-			g.drawTextLine(0, 0, Math.floor(cardInterval - cardTimer) + "");
+			if (state != STATE_CARD_READY)
+			{
+				format.size = 45;
+				g.textFormat(format);
+				g.drawTextLine(0, 0, Math.ceil(cardInterval - cardTimer) + "");
+			}
+			else
+			{
+				format.size = 30;
+				g.textFormat(format);
+				g.drawTextLine(0, 0, "Ready");
+			}
+
+			glow.alpha = glowMaxAlpha * Math.abs(Math.sin(glowTime));
 
 			super.render();
 		}
 
+		public function get touchableObject():DisplayObject
+		{
+			return holder;
+		}
+
 		override public function tick(dt:Number)
 		{
-			cardTimer += dt;
+			if (state == STATE_IDLE)
+				cardTimer += dt;
 
 			if (cardTimer >= cardInterval)
 			{
-				cardTimer -= cardInterval;
+				cardTimer = cardInterval;
 				// do things to enable card draw
+				state = STATE_CARD_READY;
 			}
+
+			if (state == STATE_CARD_READY)
+				glowTime += dt * 2;
 
 			super.tick(dt);
 		}
