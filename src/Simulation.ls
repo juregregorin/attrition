@@ -56,6 +56,12 @@ package
 
 		public function simulationTick():void
 		{
+			if (currentPopulation == 0)
+			{
+				Environment.instance().gameOver = true;
+				return;
+			}
+
 			foodBalance = 0;
 			var settlements = 0;
 			for (var i = 0; i < Const.NUM_TILES; i++)

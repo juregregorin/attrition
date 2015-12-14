@@ -55,6 +55,10 @@ package
 		private var selectedSpell:Card = null;
 		private var targetingMode:Boolean = false;
 
+		private var isGameOver = false;
+
+		private var gameOverOverlay:Image;
+
 		public function Environment(stage:Stage)
 		{
 			_instance = this;
@@ -150,6 +154,12 @@ package
 
 			stage.addChild(ui);
 			stage.addChild(cards);
+
+			gameOverOverlay = new Image(Texture.fromAsset("assets/gameover.png"));
+			gameOverOverlay.width = 1280;
+			gameOverOverlay.height = 720;
+			gameOverOverlay.visible = false;
+			stage.addChild(gameOverOverlay);
 		}
 
 		public static function instance():Environment
@@ -223,6 +233,9 @@ package
 
 		public function tick(dt:Number)
 		{
+			if (isGameOver)
+				return;
+
 			for (var i:int = 0; i < entities.length; i++)
 			{
 				var entity = entities[i];
@@ -305,6 +318,17 @@ package
 				if (selectedSpell == null)
 					pickCard(Card.selectedCard());
 			}
+		}
+
+		public function set gameOver(val:Boolean)
+		{
+			isGameOver = val;
+			gameOverOverlay.visible = val;
+		}
+
+		public function get gameOver():Boolean
+		{
+			return isGameOver;
 		}
 	}
 

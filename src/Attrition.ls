@@ -81,6 +81,14 @@ package
 
 		private function touchEvent(e:TouchEvent)
 		{
+			if (environment.gameOver)
+			{
+				stage.removeChildren(0, stage.numChildren -1, true);
+				environment = new Environment(stage);
+				skipMusic = true;
+				return;
+			}
+
 			var touch:Touch = e.getTouch(stage, TouchPhase.ENDED);
 			if (touch == null)
 				touch = e.getTouch(stage, TouchPhase.BEGAN);
