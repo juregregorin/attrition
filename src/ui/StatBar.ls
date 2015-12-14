@@ -36,7 +36,7 @@ package ui
 		private var format:TextFormat;
 		private var format2:TextFormat;
 
-		private var yText:Number = 25;
+		private var yText:Number = 23;
 
 		private var g:Graphics;
 
@@ -129,12 +129,12 @@ package ui
 		{
 			g.clear();
 			g.textFormat(format);
-			g.drawTextLine(foodIcon.x + 90, yText, curFood + "");
-			g.drawTextLine(manaIcon.x + 90, yText, curMana + "");
-			g.drawTextLine(populationIcon.x + 90, yText, curPop + "");
+			g.drawTextLine(foodIcon.x + 110, yText, curFood + "");
+			g.drawTextLine(manaIcon.x + 100, yText, curMana + "");
+			g.drawTextLine(populationIcon.x + 110, yText, curPop + "");
 
 			g.textFormat(format2);
-			g.drawTextLine(manaIcon.x + 90, yText, " / 10");
+			g.drawTextLine(manaIcon.x + 100, yText, " / 10");
 		}
 	}
 

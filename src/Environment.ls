@@ -57,6 +57,11 @@ package
 
 		private var gameOverOverlay:Image;
 
+		private var pFood:Number = 0;
+		private var pPop:Number = 0;
+		private var popTrend:Number = 0;
+		private var pMana:Number = 0;
+
 		public function Environment(stage:Stage)
 		{
 			_instance = this;
@@ -85,7 +90,7 @@ package
 			logText = new TextUI(10);
 			logText.rowOffset = -10;
 			logText.x = 5;
-			logText.y = stage.stageHeight - (15 * (logText.format.size - 10) + 5);
+			logText.y = 720 - (10 * (logText.format.size - 10) + 5);
 
 			cardPlayer = new Sprite();
 			var cp = new Image(Texture.fromAsset("assets/play-card.png"));
@@ -168,16 +173,16 @@ package
 			switch(selectedSpell.type)
 			{
 				case Card.TYPE_MEDITATE:
-					addLog("Meditate", TextUI.COLOR_POSITIVE);
+					addLog("You cast " + selectedSpell.name, TextUI.COLOR_DEFAULT);
 					break;
 				case Card.TYPE_RAIN:
-					addLog("Downpour", TextUI.COLOR_POSITIVE);
+					addLog("You cast " + selectedSpell.name, TextUI.COLOR_DEFAULT);
 					break;
 				case Card.TYPE_FOOD:
-					addLog("Plentiful Harvest", TextUI.COLOR_POSITIVE);
+					addLog("You cast " + selectedSpell.name, TextUI.COLOR_DEFAULT);
 					break;
 				case Card.TYPE_HEAL:
-					addLog("Divine Remedy", TextUI.COLOR_POSITIVE);
+					addLog("You cast " + selectedSpell.name, TextUI.COLOR_DEFAULT);
 					break;
 			}
 
@@ -200,7 +205,6 @@ package
 				{
 					case Card.TYPE_RAIN:
 						t[i].water += selectedSpell.intensity / 100;
-						addLog(t[i].water + "");
 						break;
 				}
 			}
@@ -261,6 +265,24 @@ package
 			statBar.food = simulation.currentFood;
 			statBar.foodRate = simulation.foodTrend;
 			statBar.population = simulation.currentPopulation;
+
+			if (simulation.currentFood != pFood && simulation.currentFood == 0)
+			{
+				pFood = simulation.currentFood;
+				addLog("Food reserves empty!", TextUI.COLOR_NEGATIVE);
+			}
+
+			if (simulation.currentPopulation != pPop)
+			{
+				if (popTrend > 0 && simulation.currentPopulation < pPop)
+					addLog("Population is falling!", TextUI.COLOR_NEGATIVE);
+				else if (popTrend < 0 && simulation.currentPopulation > pPop)
+					addLog("Population is rising!", TextUI.COLOR_POSITIVE);
+
+				pPop = simulation.currentPopulation < pPop ? -1 : simulation.currentPopulation > pPop ? 1 : 0;
+				pPop = simulation.currentPopulation;
+			}
+
 
 			if (Card.selectedCard() != null)
 			{
