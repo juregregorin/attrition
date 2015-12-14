@@ -74,6 +74,8 @@
 					t.x = startX + (i * Tile.VIRTUAL_WIDTH / 2) + ((Const.NUM_TILES - 1) * -Tile.VIRTUAL_WIDTH / 2 );
 					t.y = startY + (i * Tile.VIRTUAL_HEIGHT / 2) + ((Const.NUM_TILES - 1) * Tile.VIRTUAL_HEIGHT / 2) + 46;
 					t.type = TileType.Bottom;
+					t.updateTexture();
+
 					t.flip = true;
 
 					bottomTiles.push(t);
@@ -85,6 +87,7 @@
 					t.x = startX + ((Const.NUM_TILES - 1) * Tile.VIRTUAL_WIDTH / 2) + (i * -Tile.VIRTUAL_WIDTH / 2 );
 					t.y = startY + ((Const.NUM_TILES - 1) * Tile.VIRTUAL_HEIGHT / 2) + (i * Tile.VIRTUAL_HEIGHT / 2) + 46;
 					t.type = TileType.Bottom;
+					t.updateTexture();
 
 					bottomTiles.push(t);
 				}

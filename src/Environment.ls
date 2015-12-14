@@ -233,6 +233,20 @@ package
 
 		public function tick(dt:Number)
 		{
+			fogFront.x -= dt * 10;
+			fogFront2.x -= dt * 10;
+			if (fogFront.x + fogFront.width <= 0)
+				fogFront.x += fogFront.width * 2;
+			if (fogFront2.x + fogFront2.width <= 0)
+				fogFront2.x += fogFront2.width * 2;
+
+			fogBack.x += dt * 10;
+			fogBack2.x += dt * 10;
+			if (fogBack.x >= Const.SCREEN_WIDTH)
+				fogBack.x -= fogBack.width * 2;
+			if (fogBack2.x >= Const.SCREEN_WIDTH)
+				fogBack2.x -= fogBack2.width * 2;
+
 			if (isGameOver)
 				return;
 
@@ -256,20 +270,6 @@ package
 			cardTimer += dt;*/
 
 			testProgress.progress = testProgress.progress >= 1 ? testProgress.progress - 1 : testProgress.progress + dt;
-
-			fogFront.x -= dt * 10;
-			fogFront2.x -= dt * 10;
-			if (fogFront.x + fogFront.width <= 0)
-				fogFront.x += fogFront.width * 2;
-			if (fogFront2.x + fogFront2.width <= 0)
-				fogFront2.x += fogFront2.width * 2;
-
-			fogBack.x += dt * 10;
-			fogBack2.x += dt * 10;
-			if (fogBack.x >= Const.SCREEN_WIDTH)
-				fogBack.x -= fogBack.width * 2;
-			if (fogBack2.x >= Const.SCREEN_WIDTH)
-				fogBack2.x -= fogBack2.width * 2;
 
 			simulation.tick(dt);
 		}

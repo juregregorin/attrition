@@ -110,6 +110,15 @@ package
 				}
 			}
 
+			for (i = 0; i < Const.NUM_TILES; i++)
+			{
+				for (j = 0; j < Const.NUM_TILES; j++)
+				{
+					t = Environment.instance().iso.getTile(i, j);
+					t.update();
+				}
+			}
+
 			if (foodBalance <= 0)
 				foodStatus -= 1;
 			else
