@@ -14,6 +14,7 @@ package
 	import loom.sound.SimpleAudioEngine;
 	import loom2d.events.KeyboardEvent;
 	import loom.platform.LoomKey;
+	import system.platform.Platform;
 
 	public class Attrition extends Application
 	{
@@ -51,9 +52,15 @@ package
 			stage.addEventListener(KeyboardEvent.KEY_DOWN, keyboardEvent);
 		}
 
+		var lastTickTime = 0;
+
 		override public function onTick()
 		{
-			environment.tick(time.deltaTime);
+			var t = Platform.getTime();
+			var dt = t - lastTickTime;
+			lastTickTime = t;
+
+			environment.tick(dt / 1000);
 			if (!audio.isBackgroundMusicPlaying() || skipMusic)
 			{
 				musicIndex++;
