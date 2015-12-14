@@ -2,6 +2,7 @@ package
 {
 	import loom.Application;
 	import loom.gameframework.TimeManager;
+	import loom.sound.Sound;
 	import loom2d.display.StageScaleMode;
 	import loom2d.display.Image;
 	import loom2d.textures.Texture;
@@ -10,6 +11,9 @@ package
 	import loom2d.events.Touch;
 	import loom2d.events.TouchEvent;
 	import loom2d.events.TouchPhase;
+	import loom.sound.SimpleAudioEngine;
+	import loom2d.events.KeyboardEvent;
+	import loom.platform.LoomKey;
 
 	public class Attrition extends Application
 	{
@@ -18,19 +22,45 @@ package
 		[Inject]
 		private var time:TimeManager;
 
+		private var audio:SimpleAudioEngine;
+
+		private var music:Vector.<String> = new Vector.<String>
+		[
+			"assets/music/dark-shrine.ogg",
+			"assets/music/caryil-the-desert-of-dreams.ogg",
+			"assets/music/forgotten-victory.ogg",
+			"assets/music/meditation.ogg",
+			"assets/music/temple-of-the-mystics.ogg",
+			"assets/music/this-used-to-be-a-city.ogg",
+		];
+
+		var musicIndex = 0;
+		var skipMusic = false;
+
 		override public function run():void
 		{
 			stage.scaleMode = StageScaleMode.LETTERBOX;
-			this.stage.reportFps = true;
 
 			environment = new Environment(stage);
+			audio = SimpleAudioEngine.sharedEngine();
+			audio.playBackgroundMusic(music[musicIndex], false);
 
 			stage.addEventListener(TouchEvent.TOUCH, touchEvent);
+			stage.addEventListener(KeyboardEvent.KEY_DOWN, keyboardEvent);
 		}
 
 		override public function onTick()
 		{
 			environment.tick(time.deltaTime);
+			if (!audio.isBackgroundMusicPlaying() || skipMusic)
+			{
+				musicIndex++;
+				musicIndex = musicIndex % music.length;
+				audio.playBackgroundMusic(music[musicIndex], false);
+				skipMusic = false;
+
+				trace("skip =======================================================================================");
+			}
 
 			return super.onTick();
 		}
@@ -39,6 +69,14 @@ package
 		{
 			environment.render();
 			return super.onFrame();
+		}
+
+		private function keyboardEvent(e:KeyboardEvent)
+		{
+			if (e.keyCode == LoomKey.F12)
+			{
+				skipMusic = true;
+			}
 		}
 
 		private function touchEvent(e:TouchEvent)

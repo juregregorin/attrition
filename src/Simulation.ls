@@ -119,7 +119,7 @@ package
 					tiles[i].removePopulated();
 					result++;
 				}
-				trace("killing in tile with food production " + tiles[i].foodProduction);
+				//trace("killing in tile with food production " + tiles[i].foodProduction);
 			}
 
 			return result;
