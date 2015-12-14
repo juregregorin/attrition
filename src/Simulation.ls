@@ -1,5 +1,6 @@
 package
 {
+	import loom.sound.SimpleAudioEngine;
 	import TileType;
 
 	public class Simulation
@@ -12,9 +13,12 @@ package
 		private var turnsStarving = 0;
 		private var lastFoodRatio = 1;
 
+		private var audio:SimpleAudioEngine;
+
 		public function Simulation()
 		{
 			elapsedTime = 0;
+			audio = SimpleAudioEngine.sharedEngine();
 		}
 
 		public function tick(dt:Number):void
@@ -29,6 +33,8 @@ package
 
 		public function simulationTick():void
 		{
+			var playedSound = false;
+
 			foodBalance = 0;
 			var settlements = 0;
 			for (var i = 0; i < Const.NUM_TILES; i++)
@@ -60,6 +66,12 @@ package
 									{
 										tt.population = 1;
 										settlements++;
+
+										if (!playedSound)
+										{
+											audio.playEffect("assets/sounds/build.ogg");
+											playedSound = true;
+										}
 									}
 								}
 							}
@@ -85,6 +97,11 @@ package
 				turnsStarving++;
 				turnsStarving = Math.clamp(turnsStarving, 0, 10);
 				settlements -= starve(turnsStarving);
+				if (!playedSound)
+				{
+					audio.playEffect(Math.randomRangeInt(0, 1) ? "assets/sounds/death1.ogg" : "assets/sounds/death2.ogg");
+					playedSound = true;
+				}
 				foodStatus = 0;
 			}
 			else
