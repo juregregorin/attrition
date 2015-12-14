@@ -205,7 +205,7 @@ package ui
 
 		public static function newCard()
 		{
-			var c = new Card(TYPE_RAIN);
+			var c = new Card();
 
 			c.state = STATE_IN_DECK;
 			c.render();

@@ -20,6 +20,7 @@ package
 		protected var members:Vector.<Entity>;
 
 		public var rotation:Number = 0;
+		private var _alpha:Number = 1;
 
 		public function Entity() {}
 
@@ -69,6 +70,16 @@ package
 		public function getState():String
 		{
 			return state;
+		}
+
+		public function get alpha():Number
+		{
+			return alpha;
+		}
+
+		public function set alpha(a:Number)
+		{
+			_alpha = a < 0 ? 0 : a > 1 ? 1 : a;
 		}
 	}
 

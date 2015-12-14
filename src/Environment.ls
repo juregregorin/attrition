@@ -11,7 +11,7 @@ package
 	import loom2d.events.TouchPhase;
 	import loom2d.textures.Texture;
 	import ui.Card;
-	import ui.Portrait;
+	import ui.StatBar;
 	import ui.ProgressUI;
 	import ui.TextUI;
 
@@ -35,7 +35,6 @@ package
 		private var tempStats:TextUI;
 
 		private var testProgress:ProgressUI;
-		private var manaDisplay:TextUI;
 		private var cards:Sprite;
 
 		private var fogBack:Image;
@@ -44,7 +43,7 @@ package
 		private var fogFront:Image;
 		private var fogFront2:Image;
 
-		private var portrait:Portrait;
+		private var statBar:StatBar;
 
 		private var cardTimer:Number = 0;
 		private var cardTreshold:Number = 2;
@@ -110,16 +109,16 @@ package
 			cards.x = stage.stageWidth -210;
 			cards.y = stage.nativeStageHeight - 70;
 
-			portrait = new Portrait();
-			portrait.setPosition(stage.stageWidth / 2, 40);
+			statBar = new StatBar();
+			ui.addChild(statBar);
 
-			manaDisplay = new TextUI(1);
-			manaDisplay.setPosition(portrait.getPosition().x - 150, portrait.getPosition().y);
+			/*manaDisplay = new TextUI(1);
+			manaDisplay.setPosition(statBar.x - 150, 22);
 			var manaF:TextFormat = manaDisplay.format;
 			manaF.align = TextAlign.RIGHT;
 			manaF.size = 20;
 			manaDisplay.format = manaF;
-			addEntity(manaDisplay);
+			addEntity(manaDisplay);*/
 
 			simulation = new Simulation();
 
@@ -132,7 +131,6 @@ package
 
 			addEntity(logText);
 			addEntity(testProgress);
-			addEntity(portrait);
 
 			fogFront = new Image(Texture.fromAsset("assets/fog_top.png"));
 			fogFront.alpha = 0.5;
@@ -266,8 +264,6 @@ package
 			tempStats.setText("Current population: " + simulation.currentPopulation, TextUI.COLOR_POSITIVE);
 			tempStats.setText("Current food: " + simulation.currentFood, TextUI.COLOR_NEGATIVE);
 			tempStats.setText("Food trend: " + simulation.foodTrend);
-
-			manaDisplay.setText("20");
 
 			for (var i:int = 0; i < entities.length; i++)
 			{
