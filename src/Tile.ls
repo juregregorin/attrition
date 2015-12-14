@@ -206,6 +206,8 @@ package
 		private var _logx:Number;
 		private var _logy:Number;
 
+		private var needsUpdate = false;
+
 		public function Tile(topLayer:DisplayObjectContainer, baseLayer:DisplayObjectContainer, logx:Number, logy:Number)
 		{
 			_population = 0;
@@ -229,6 +231,9 @@ package
 
 		public function update()
 		{
+			if (!needsUpdate)
+				return;
+
 			updateTexture();
 			updateTopTexture();
 		}
@@ -236,8 +241,7 @@ package
 		public function set population(p:Number):void
 		{
 			_population = p;
-
-			updateTopTexture();
+			needsUpdate = true;
 		}
 
 		public function get water():Number
@@ -269,6 +273,8 @@ package
 			{
 				type = TileType.Forest;
 			}
+
+			needsUpdate = true;
 		}
 
 		public function removePopulated()
@@ -286,8 +292,6 @@ package
 				_top.touchable = false;
 				_base.touchable = false;
 			}
-
-			updateTexture();
 		}
 
 		public function get type():TileType
@@ -297,14 +301,17 @@ package
 
 		public function updateTexture()
 		{
-			_base.texture = TileTextures.getTexture(_type, _variant);
+			var t = TileTextures.getTexture(_type, _variant);
+			if (t != _base.texture)
+				_base.texture = t;
 		}
 
 		public function updateTopTexture()
 		{
+			var t:Texture = _top.texture;
 			if (_population == 0)
 			{
-				_top.texture = TileTextures.getTopTexture(_type, _variant, -1);
+				t = TileTextures.getTopTexture(_type, _variant, -1);
 			}
 			else
 			{
@@ -332,14 +339,16 @@ package
 
 				if (Environment.instance().simulation.currentPopulation > 500)
 				{
-					_top.texture = TileTextures.getTopTexture(TileType.Advanced, _variant, pv);
+					t = TileTextures.getTopTexture(TileType.Advanced, _variant, pv);
 				}
 				else
 				{
-					_top.texture = TileTextures.getTopTexture(TileType.Settlement, _variant, pv);
+					t = TileTextures.getTopTexture(TileType.Settlement, _variant, pv);
 				}
 			}
 
+			if (t != _top.texture)
+				_top.texture = t;
 		}
 
 		public function set flip(value:Boolean)

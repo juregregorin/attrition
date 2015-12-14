@@ -56,6 +56,12 @@ package
 
 		public function simulationTick():void
 		{
+			if (currentPopulation == 0)
+			{
+				Environment.instance().gameOver = true;
+				return;
+			}
+
 			foodBalance = 0;
 			var settlements = 0;
 			for (var i = 0; i < Const.NUM_TILES; i++)
@@ -101,6 +107,15 @@ package
 						foodBalance -= t.foodConsumption;
 					}
 
+				}
+			}
+
+			for (i = 0; i < Const.NUM_TILES; i++)
+			{
+				for (j = 0; j < Const.NUM_TILES; j++)
+				{
+					t = Environment.instance().iso.getTile(i, j);
+					t.update();
 				}
 			}
 

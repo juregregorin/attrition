@@ -54,6 +54,10 @@ package
 		private var selectedSpell:Card = null;
 		private var targetingMode:Boolean = false;
 
+		private var isGameOver = false;
+
+		private var gameOverOverlay:Image;
+
 		public function Environment(stage:Stage)
 		{
 			_instance = this;
@@ -137,6 +141,12 @@ package
 			cardTimer.x = 1280 / 2;
 			cardTimer.y = cardTimer.height / 2;
 			cardTimer.touchableObject.addEventListener(TouchEvent.TOUCH, touchEvent);
+
+			gameOverOverlay = new Image(Texture.fromAsset("assets/gameover.png"));
+			gameOverOverlay.width = 1280;
+			gameOverOverlay.height = 720;
+			gameOverOverlay.visible = false;
+			stage.addChild(gameOverOverlay);
 		}
 
 		public static function instance():Environment
@@ -213,19 +223,6 @@ package
 
 		public function tick(dt:Number)
 		{
-			for (var i:int = 0; i < entities.length; i++)
-			{
-				var entity = entities[i];
-				entity.tick(dt);
-			}
-
-			if (!Card.handIsFull() && !Card.deckIsEmpty())
-			{
-				Card.drawCard();
-			}
-
-			testProgress.progress = testProgress.progress >= 1 ? testProgress.progress - 1 : testProgress.progress + dt;
-
 			fogFront.x -= dt * 10;
 			fogFront2.x -= dt * 10;
 			if (fogFront.x + fogFront.width <= 0)
@@ -239,6 +236,22 @@ package
 				fogBack.x -= fogBack.width * 2;
 			if (fogBack2.x >= Const.SCREEN_WIDTH)
 				fogBack2.x -= fogBack2.width * 2;
+
+			if (isGameOver)
+				return;
+
+			for (var i:int = 0; i < entities.length; i++)
+			{
+				var entity = entities[i];
+				entity.tick(dt);
+			}
+
+			if (!Card.handIsFull() && !Card.deckIsEmpty())
+			{
+				Card.drawCard();
+			}
+
+			testProgress.progress = testProgress.progress >= 1 ? testProgress.progress - 1 : testProgress.progress + dt;
 
 			simulation.tick(dt);
 		}
@@ -291,6 +304,17 @@ package
 				if (selectedSpell == null)
 					pickCard(Card.selectedCard());
 			}
+		}
+
+		public function set gameOver(val:Boolean)
+		{
+			isGameOver = val;
+			gameOverOverlay.visible = val;
+		}
+
+		public function get gameOver():Boolean
+		{
+			return isGameOver;
 		}
 	}
 

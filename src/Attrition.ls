@@ -27,10 +27,7 @@ package
 		private var music:Vector.<String> = new Vector.<String>
 		[
 			"assets/music/dark-shrine.ogg",
-			"assets/music/caryil-the-desert-of-dreams.ogg",
-			"assets/music/forgotten-victory.ogg",
 			"assets/music/meditation.ogg",
-			"assets/music/temple-of-the-mystics.ogg",
 			"assets/music/this-used-to-be-a-city.ogg",
 		];
 
@@ -43,6 +40,11 @@ package
 
 			environment = new Environment(stage);
 			audio = SimpleAudioEngine.sharedEngine();
+
+
+			for each (var i in music)
+				audio.preloadBackgroundMusic(i);
+
 			audio.playBackgroundMusic(music[musicIndex], false);
 
 			stage.addEventListener(TouchEvent.TOUCH, touchEvent);
@@ -58,8 +60,6 @@ package
 				musicIndex = musicIndex % music.length;
 				audio.playBackgroundMusic(music[musicIndex], false);
 				skipMusic = false;
-
-				trace("skip =======================================================================================");
 			}
 
 			return super.onTick();
@@ -81,6 +81,14 @@ package
 
 		private function touchEvent(e:TouchEvent)
 		{
+			if (environment.gameOver)
+			{
+				stage.removeChildren(0, stage.numChildren -1, true);
+				environment = new Environment(stage);
+				skipMusic = true;
+				return;
+			}
+
 			var touch:Touch = e.getTouch(stage, TouchPhase.ENDED);
 			if (touch == null)
 				touch = e.getTouch(stage, TouchPhase.BEGAN);
