@@ -48,15 +48,6 @@ package ui
 			addChild(manaIcon);
 			addChild(populationIcon);
 			addChild(healthIcon);
-
-			addEventListener(Event.ADDED_TO_STAGE, init);
-		}
-
-		private function init()
-		{
-			cardTimer = new CardTimer();
-			cardTimer.x = 1280 / 2;
-			cardTimer.y = cardTimer.height / 2;
 		}
 
 		public function set food(f:Number)

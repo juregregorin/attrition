@@ -101,10 +101,13 @@ package
 				touch = e.getTouch(stage, TouchPhase.BEGAN);
 			if (touch)
 			{
-				trace("brodcasting touch");
-				Environment.instance().iso.touchable = true;
-				Environment.instance().iso.broadcastEvent(new TouchEvent(e.type, e.touches, e.shiftKey, e.ctrlKey, false));
-				Environment.instance().iso.touchable = false;
+				if (environment.isTargeting())
+				{
+					trace("brodcasting touch to map");
+					Environment.instance().iso.touchable = true;
+					Environment.instance().iso.broadcastEvent(new TouchEvent(e.type, e.touches, e.shiftKey, e.ctrlKey, false));
+					Environment.instance().iso.touchable = false;
+				}
 			}
 		}
 	}
