@@ -63,7 +63,7 @@ package
 
 		private var maxMana:Number = 10;
 		private var curMana:Number = 5;
-		private var rechargeRate:Number = 1;
+		private var rechargeRate:Number = 0.05;
 
 		private var manaTime:Number = 0;
 
@@ -178,8 +178,6 @@ package
 		{
 			if (selectedSpell == null && !targetingMode) return;
 
-			addLog("Playing spell " + selectedSpell.name);
-
 			var t:Vector.<Tile>;
 
 			if (tile != null)
@@ -192,7 +190,7 @@ package
 			switch(selectedSpell.type)
 			{
 				case Card.TYPE_MEDITATE:
-					rechargeRate = 3;
+					rechargeRate = 0.5;
 					canPlayCards = false;
 					addLog("You cast " + selectedSpell.name, TextUI.COLOR_DEFAULT);
 					break;
@@ -270,7 +268,7 @@ package
 			if (curMana >= maxMana)
 			{
 				curMana = maxMana;
-				rechargeRate = 1;
+				rechargeRate = 0.05;
 				canPlayCards = true;
 			}
 
@@ -313,11 +311,6 @@ package
 
 			if (simulation.currentPopulation != pPop)
 			{
-				if (popTrend > 0 && simulation.currentPopulation < pPop)
-					addLog("Population is falling!", TextUI.COLOR_NEGATIVE);
-				else if (popTrend < 0 && simulation.currentPopulation > pPop)
-					addLog("Population is rising!", TextUI.COLOR_POSITIVE);
-
 				pPop = simulation.currentPopulation < pPop ? -1 : simulation.currentPopulation > pPop ? 1 : 0;
 				pPop = simulation.currentPopulation;
 			}
