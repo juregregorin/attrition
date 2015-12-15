@@ -166,29 +166,60 @@ package
 		{
 			if (c == null) return;
 			selectedSpell = c;
-			if (selectedSpell.target == Card.TARGET_AREA)
+			if (selectedSpell.target == Card.TARGET_AREA || selectedSpell.target == Card.TARGET_SINGLE)
 				targetingMode = true;
 			if (selectedSpell.target == Card.TARGET_SELF || selectedSpell.target == Card.TARGET_ALL)
-				useCard();
+				playSpell();
 		}
 
-		public function useCard()
+		public function playSpell(tile:Tile = null)
 		{
-			if (selectedSpell == null) return;
+			if (selectedSpell == null && !targetingMode) return;
+
+			addLog("Playing spell " + selectedSpell.name);
+
+			var t:Vector.<Tile>;
+
+			if (tile != null)
+			{
+				t = new Vector.<Tile>();
+				t.push(tile);
+				t = t.concat(simulation.getNeighbours(tile.logx, tile.logy));
+			}
 
 			switch(selectedSpell.type)
 			{
 				case Card.TYPE_MEDITATE:
+					// TODO add mana
 					addLog("You cast " + selectedSpell.name, TextUI.COLOR_DEFAULT);
 					rechargeRate = 2;
 					break;
 				case Card.TYPE_RAIN:
+					for (var i = 0; i < t.length; i++)
+					{
+						t[i].water += selectedSpell.intensity / 100;
+					}
+					addLog("You cast " + selectedSpell.name, TextUI.COLOR_DEFAULT);
+					break;
+				case Card.TYPE_SACRIFICE:
+					if (selectedSpell.target == Card.TARGET_SINGLE)
+					{
+						tile.population = Math.max(0, tile.population - 1);
+					}
+					else
+					{
+						for (i = 0; i < t.length; i++)
+						{
+							t[i].population = Math.max(0, tile.population - 1);
+						}
+					}
 					addLog("You cast " + selectedSpell.name, TextUI.COLOR_DEFAULT);
 					break;
 				case Card.TYPE_FOOD:
-					addLog("You cast " + selectedSpell.name, TextUI.COLOR_DEFAULT);
-					break;
-				case Card.TYPE_HEAL:
+					for (i = 0; i < t.length; i++)
+					{
+						t[i].foodBonus += selectedSpell.intensity / 100;
+					}
 					addLog("You cast " + selectedSpell.name, TextUI.COLOR_DEFAULT);
 					break;
 			}
@@ -196,29 +227,8 @@ package
 			curMana -= selectedSpell.cost;
 
 			selectedSpell.destroy();
-
 			selectedSpell = null;
 			targetingMode = false;
-		}
-
-		public function tileSelected(tile:Tile)
-		{
-			if (selectedSpell == null && !targetingMode) return;
-
-			var t:Vector.<Tile> = new Vector.<Tile>();
-			t.push(tile);
-			t = t.concat(simulation.getNeighbours(tile.logx, tile.logy));
-
-			for (var i = 0; i < t.length; i++) {
-				switch (selectedSpell.type)
-				{
-					case Card.TYPE_RAIN:
-						t[i].water += selectedSpell.intensity / 100;
-						break;
-				}
-			}
-
-			useCard();
 		}
 
 		public function addEntity(e:Entity)
