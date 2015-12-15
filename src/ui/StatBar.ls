@@ -28,6 +28,7 @@ package ui
 		private var curHealth:Number = 0;
 		private var maxHealth:Number = 100;
 		private var curMana:Number = 0;
+		private var maxMana:Number = 0;
 
 		private var tiFood:TrendIndicator;
 		private var tiPop:TrendIndicator;
@@ -125,6 +126,11 @@ package ui
 			updateText();
 		}
 
+		public function set maximumMana(m:Number)
+		{
+			maxMana = m;
+		}
+
 		private function updateText()
 		{
 			g.clear();
@@ -134,7 +140,7 @@ package ui
 			g.drawTextLine(populationIcon.x + 110, yText, curPop + "");
 
 			g.textFormat(format2);
-			g.drawTextLine(manaIcon.x + 100, yText, " / 10");
+			g.drawTextLine(manaIcon.x + 100, yText, " / " + maxMana);
 		}
 	}
 

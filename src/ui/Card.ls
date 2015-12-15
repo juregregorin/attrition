@@ -135,7 +135,7 @@ package ui
 			if (state == STATE_IN_DECK)
 				cardBase.alpha = 0;
 			else
-				cardBase.alpha = 1;
+				cardBase.alpha = _alpha;
 
 			cardBase.x = x;
 			cardBase.y = y;
@@ -249,6 +249,7 @@ package ui
 
 		public static function handIsFull():Boolean
 		{
+			environment.addLog(CARDS.length + " | " + MAX_CARDS);
 			return CARDS.length >= MAX_CARDS;
 		}
 
