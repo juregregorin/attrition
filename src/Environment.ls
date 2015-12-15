@@ -195,6 +195,7 @@ package
 					rechargeRate = 0.5;
 					canPlayCards = false;
 					addLog("You cast " + selectedSpell.name, TextUI.COLOR_DEFAULT);
+					Environment.instance().simulation.playEffect("assets/sounds/magic4.ogg", SoundType.Other);
 					break;
 				case Card.TYPE_RAIN:
 					for (var i = 0; i < t.length; i++)
@@ -202,19 +203,23 @@ package
 						t[i].water += selectedSpell.intensity / 100;
 					}
 					addLog("You cast " + selectedSpell.name, TextUI.COLOR_DEFAULT);
+					Environment.instance().simulation.playEffect("assets/sounds/watersplash.ogg", SoundType.Other);
 					break;
 				case Card.TYPE_SACRIFICE:
 					if (selectedSpell.target == Card.TARGET_SINGLE)
 					{
+						if (tile.population > 0) curMana++;
 						tile.population = Math.max(0, tile.population - 1);
 					}
 					else
 					{
 						for (i = 0; i < t.length; i++)
 						{
+							if (tile.population > 0) curMana++;
 							t[i].population = Math.max(0, t[i].population - 1);
 						}
 					}
+					Environment.instance().simulation.playEffect("assets/sounds/magic1.ogg", SoundType.Other);
 					addLog("You cast " + selectedSpell.name, TextUI.COLOR_DEFAULT);
 					break;
 				case Card.TYPE_FOOD:
@@ -223,6 +228,7 @@ package
 						t[i].foodBonus += selectedSpell.intensity / 100;
 					}
 					addLog("You cast " + selectedSpell.name, TextUI.COLOR_DEFAULT);
+					Environment.instance().simulation.playEffect("assets/sounds/magic2.ogg", SoundType.Other);
 					break;
 			}
 

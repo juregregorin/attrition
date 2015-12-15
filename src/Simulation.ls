@@ -7,7 +7,8 @@ package
 	public enum SoundType
 	{
 		Build,
-		Death
+		Death,
+		Other
 	}
 
 	public class Simulation
@@ -25,10 +26,10 @@ package
 		private var timeSinceLastSound:Number = 0;
 		private var lastSoundType:SoundType;
 
-		private function playEffect(path:String, type:SoundType):void
+		public function playEffect(path:String, type:SoundType):void
 		{
 			if ((currentSound == null || !currentSound.isPlaying()) &&
-				(lastSoundType == null || (lastSoundType == type && timeSinceLastSound > 10) || lastSoundType != type))
+				(lastSoundType == null || (lastSoundType == type && timeSinceLastSound > 10) || lastSoundType != type || type == SoundType.Other))
 			{
 				var id = audio.playEffect(path, false);
 				currentSound = audio.getSoundById(id);
