@@ -203,7 +203,7 @@ package
 					{
 						for (i = 0; i < t.length; i++)
 						{
-							t[i].population = Math.max(0, tile.population - 1);
+							t[i].population = Math.max(0, t[i].population - 1);
 						}
 					}
 					addLog("You cast " + selectedSpell.name, TextUI.COLOR_DEFAULT);
