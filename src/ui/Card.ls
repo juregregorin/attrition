@@ -260,7 +260,6 @@ package ui
 
 		public static function handIsFull():Boolean
 		{
-			environment.addLog(CARDS.length + " | " + MAX_CARDS);
 			return CARDS.length >= MAX_CARDS;
 		}
 
