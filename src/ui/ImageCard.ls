@@ -21,11 +21,13 @@ package ui
 		public static var TYPE_FOOD:String = "food";
 		public static var TYPE_MEDITATE:String = "meditate";
 		public static var TYPE_HEAL:String = "heal";
+		public static var TYPE_SACRIFICE:String = "sacrifice";
 
 		private static var cardRain:Texture;
 		private static var cardFood:Texture;
 		private static var cardMeditate:Texture;
 		private static var cardHeal:Texture;
+		private static var cardSacrifice:Texture;
 
 		private var cardBase:Image;
 		private var cardType:String;
@@ -92,6 +94,8 @@ package ui
 				cardMeditate = Texture.fromAsset("assets/cards/card-meditate.png");
 			if (cardHeal == null)
 				cardHeal = Texture.fromAsset("assets/cards/card-remedy.png");
+			if (cardSacrifice == null)
+				cardSacrifice = Texture.fromAsset("assets/cards/card-remedy.png");
 
 			switch(cardType)
 			{
@@ -106,6 +110,9 @@ package ui
 					break;
 				case TYPE_RAIN:
 					cardBase = new Image(cardRain);
+					break;
+				case TYPE_SACRIFICE:
+					cardBase = new Image(cardSacrifice);
 					break;
 				default:
 					return;

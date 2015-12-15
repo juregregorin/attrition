@@ -184,7 +184,7 @@ package
 			if (t.phase == TouchPhase.ENDED)
 			{
 				//color = 0xFFFFFFFF;
-				Environment.instance().tileSelected(tile);
+				Environment.instance().playSpell(tile);
 			}
 		}
 	}
@@ -205,6 +205,8 @@ package
 
 		private var _logx:Number;
 		private var _logy:Number;
+
+		public var foodBonus:Number = 0;
 
 		private var needsUpdate = false;
 
@@ -373,7 +375,7 @@ package
 
 		public function get foodProduction():Number
 		{
-			return Math.log(1 + _population * 0.4 * water);
+			return Math.log(1 + _population * 0.4 * water) * (1 + foodBonus);
 		}
 
 		public function set x(value:Number)

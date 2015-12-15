@@ -33,6 +33,7 @@ package ui
 		public static var TYPE_FOOD:String = "food";
 		public static var TYPE_MEDITATE:String = "meditate";
 		public static var TYPE_HEAL:String = "heal";
+		public static var TYPE_SACRIFICE:String = "sacrifice";
 
 		public static var TARGET_SELF:String = "self";
 		public static var TARGET_AREA:String = "area";
@@ -165,7 +166,7 @@ package ui
 						type = TYPE_RAIN;
 						break;
 					case 3:
-						type = TYPE_HEAL;
+						type = TYPE_SACRIFICE;
 						break;
 				}
 
@@ -200,6 +201,12 @@ package ui
 					spellDescription = "Heal population by *" + spellIntensity + "* percent and/or remove plague in target area.";
 					targetEffect = TARGET_AREA;
 					break;
+				case TYPE_SACRIFICE:
+					cardName = "Sacrifice";
+					manaCost = Math.randomRangeInt(0, 1) ? 0 : 4;
+					targetEffect = manaCost == 0 ? TARGET_SINGLE : TARGET_AREA;
+					spellDescription = "Sacrifice " + (manaCost == 0? "1" : "9") +" of the population in the target "
+									 + (manaCost == 0 ? "tile" : "area") + ". You gain 1 aether for each sacrifice.";
 			}
 		}
 
