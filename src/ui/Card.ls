@@ -40,8 +40,6 @@ package ui
 		public static var TARGET_ALL:String = "all";
 		public static var TARGET_SINGLE:String = "single";
 
-		private static var cardImages:Vector.<Image>;
-
 		private static var tweenTime:Number = 1;
 
 		private static var drawTween:Tween;
@@ -64,10 +62,6 @@ package ui
 
 		public function Card(type:String = "")
 		{
-
-			if (cardImages == null)
-				cardImages = new Vector.<Image>();
-
 			if (drawTween == null)
 			{
 				drawTween = new Tween(this, tweenTime, Transitions.EASE_IN);
@@ -469,6 +463,28 @@ package ui
 				else
 					c.enabled = true;
 			}
+		}
+
+		public static function reset()
+		{
+			while (CARDS.length > 0)
+			{
+				CARDS.pop();
+			}
+			while (TWEENS.length > 0)
+			{
+				TWEENS.pop();
+			}
+			while (CARD_LOCATIONS.length > 0)
+			{
+				CARD_LOCATIONS.pop();
+			}
+			while (CARD_DECK.length > 0)
+			{
+				CARD_DECK.pop();
+			}
+
+			SELECTED_CARD = null;
 		}
 
 		public function toString():String

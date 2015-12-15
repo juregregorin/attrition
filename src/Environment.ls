@@ -73,6 +73,8 @@ package
 		{
 			_instance = this;
 
+			Card.reset();
+
 			this.w = Const.SCREEN_WIDTH;
 			this.h = Const.SCREEN_HEIGHT;
 			this.h = h;
