@@ -34,6 +34,15 @@ package
 				currentSound = audio.getSoundById(id);
 				timeSinceLastSound = 0;
 				lastSoundType = type;
+
+				if (type == SoundType.Build)
+				{
+					Environment.instance().addLog("Your people are flourishing.");
+				}
+				else if (type == SoundType.Death)
+				{
+					Environment.instance().addLog("Your people are dying of starvation!");
+				}
 			}
 		}
 
