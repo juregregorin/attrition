@@ -55,6 +55,8 @@ package ui
 		private var spellDescription:String = "";
 		private var targetEffect:String = "";
 
+		public var enabled:Boolean = true;
+
 		private static var minScale:Number = 0.28;
 		private static var maxScale:Number = 0.70;
 
@@ -135,6 +137,8 @@ package ui
 		{
 			if (state == STATE_IN_DECK)
 				cardBase.alpha = 0;
+			else if (!enabled)
+				cardBase.alpha = 0.3;
 			else
 				cardBase.alpha = _alpha;
 
@@ -365,6 +369,14 @@ package ui
 			touch = e.getTouch(cardBase, TouchPhase.BEGAN);
 			if (touch)
 			{
+				if (!enabled)
+				{
+					if (environment.mana < cost)
+						environment.addLog("Not enough mana!", TextUI.COLOR_NEGATIVE);
+					else
+						environment.addLog("Cannot cast at this moment!", TextUI.COLOR_NEGATIVE);
+					return;
+				}
 				if (state == STATE_SELECTED)
 				{
 					state = STATE_HOVER;
@@ -446,6 +458,18 @@ package ui
 				}
 			}
 			return null;
+		}
+
+		public static function checkPlayability()
+		{
+			for (var i = 0; i < CARDS.length; i++)
+			{
+				var c:Card = CARDS[i];
+				if (environment.mana < c.cost || !environment.canPlayCards)
+					c.enabled = false;
+				else
+					c.enabled = true;
+			}
 		}
 
 		public function toString():String

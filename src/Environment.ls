@@ -33,7 +33,7 @@ package
 
 		private var logText:TextUI;
 
-		private var testProgress:ProgressUI;
+		//private var testProgress:ProgressUI;
 		private var cards:Sprite;
 
 		private var fogBack:Image;
@@ -61,11 +61,13 @@ package
 		private var pPop:Number = 0;
 		private var popTrend:Number = 0;
 
-		private var maxMana:Number = 15;
+		private var maxMana:Number = 10;
 		private var curMana:Number = 5;
 		private var rechargeRate:Number = 1;
 
 		private var manaTime:Number = 0;
+
+		public var canPlayCards:Boolean = true;
 
 		public function Environment(stage:Stage)
 		{
@@ -101,12 +103,12 @@ package
 			var cp = new Image(Texture.fromAsset("assets/play-card.png"));
 			cp.center();
 			cardPlayer.addChild(cp);
-			cardPlayer.x = cardPlayer.width * 2;
-			cardPlayer.y = stage.stageHeight - cardPlayer.height / 2;
+			cardPlayer.x = 290;
+			cardPlayer.y = stage.stageHeight - (cardPlayer.height / 2 + 10);
 			ui.addChild(cardPlayer);
 			cardPlayer.addEventListener(TouchEvent.TOUCH, touchEvent);
 
-			testProgress = new ProgressUI();
+			//testProgress = new ProgressUI();
 
 			cards = new Sprite();
 			cards.x = stage.stageWidth -210;
@@ -126,7 +128,7 @@ package
 			stage.addChild(fogMiddle);
 
 			addEntity(logText);
-			addEntity(testProgress);
+			//addEntity(testProgress);
 
 			fogFront = new Image(Texture.fromAsset("assets/fog_top.png"));
 			fogFront.alpha = 0.5;
@@ -190,9 +192,9 @@ package
 			switch(selectedSpell.type)
 			{
 				case Card.TYPE_MEDITATE:
-					// TODO add mana
+					rechargeRate = 3;
+					canPlayCards = false;
 					addLog("You cast " + selectedSpell.name, TextUI.COLOR_DEFAULT);
-					rechargeRate = 2;
 					break;
 				case Card.TYPE_RAIN:
 					for (var i = 0; i < t.length; i++)
@@ -259,9 +261,9 @@ package
 
 			manaTime += dt;
 
-			while (manaTime > 1 * (1/rechargeRate))
+			while (manaTime > 1/rechargeRate)
 			{
-				manaTime -= 1;
+				manaTime -= 1/rechargeRate;
 				curMana += 1;
 			}
 
@@ -269,7 +271,10 @@ package
 			{
 				curMana = maxMana;
 				rechargeRate = 1;
+				canPlayCards = true;
 			}
+
+			Card.checkPlayability();
 
 			if (isGameOver)
 				return;
@@ -286,7 +291,7 @@ package
 				cardTimer.resetTimer();
 			}
 
-			testProgress.progress = testProgress.progress >= 1 ? testProgress.progress - 1 : testProgress.progress + dt;
+			//testProgress.progress = testProgress.progress >= 1 ? testProgress.progress - 1 : testProgress.progress + dt;
 
 			simulation.tick(dt);
 		}
@@ -356,6 +361,11 @@ package
 		public function getCardUI():Sprite
 		{
 			return cards;
+		}
+
+		public function get mana():Number
+		{
+			return curMana;
 		}
 
 		public function addLog(text:String, color:uint = 0xFFFFFF)

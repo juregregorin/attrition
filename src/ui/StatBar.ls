@@ -17,7 +17,7 @@ package ui
 		private var foodIcon:Image;
 		private var manaIcon:Image;
 		private var populationIcon:Image;
-		private var healthIcon:Image;
+		//private var healthIcon:Image;
 
 		private var cardTimer:CardTimer;
 
@@ -52,17 +52,17 @@ package ui
 			foodIcon = new Image(Texture.fromAsset("assets/ui/ico_food.png"));
 			manaIcon = new Image(Texture.fromAsset("assets/ui/ico_mana.png"));
 			populationIcon = new Image(Texture.fromAsset("assets/ui/ico_population.png"));
-			healthIcon = new Image(Texture.fromAsset("assets/ui/ico_health.png"));
+			//healthIcon = new Image(Texture.fromAsset("assets/ui/ico_health.png"));
 
 			tiFood = new TrendIndicator();
 			tiPop = new TrendIndicator();
 
-			foodIcon.y = manaIcon.y = populationIcon.y = healthIcon.y = tiFood.y = tiPop.y = 25;
+			foodIcon.y = manaIcon.y = populationIcon.y = tiFood.y = tiPop.y = 25;
 
 			foodIcon.x = 100;
 			manaIcon.x = 320;
 			populationIcon.x = 770;
-			healthIcon.x = 990;
+			//healthIcon.x = 990;
 
 			//tiPop.x = 920;
 			tiPop.x = populationIcon.x + 110;
@@ -83,7 +83,7 @@ package ui
 			addChild(foodIcon);
 			addChild(manaIcon);
 			addChild(populationIcon);
-			addChild(healthIcon);
+			//addChild(healthIcon);
 
 			addChild(tiFood);
 			addChild(tiPop);
