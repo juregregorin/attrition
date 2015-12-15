@@ -20,7 +20,7 @@ package
 		protected var members:Vector.<Entity>;
 
 		public var rotation:Number = 0;
-		private var _alpha:Number = 1;
+		protected var _alpha:Number = 1;
 
 		public function Entity() {}
 

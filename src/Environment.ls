@@ -60,7 +60,12 @@ package
 		private var pFood:Number = 0;
 		private var pPop:Number = 0;
 		private var popTrend:Number = 0;
-		private var pMana:Number = 0;
+
+		private var maxMana:Number = 15;
+		private var curMana:Number = 5;
+		private var rechargeRate:Number = 1;
+
+		private var manaTime:Number = 0;
 
 		public function Environment(stage:Stage)
 		{
@@ -108,6 +113,7 @@ package
 			cards.y = stage.nativeStageHeight - 70;
 
 			statBar = new StatBar();
+			statBar.maximumMana = maxMana;
 			ui.addChild(statBar);
 
 			simulation = new Simulation();
@@ -185,7 +191,8 @@ package
 			{
 				case Card.TYPE_MEDITATE:
 					// TODO add mana
-					addLog("You cast " + selectedSpell.name, TextUI.COLOR_POSITIVE);
+					addLog("You cast " + selectedSpell.name, TextUI.COLOR_DEFAULT);
+					rechargeRate = 2;
 					break;
 				case Card.TYPE_RAIN:
 					for (var i = 0; i < t.length; i++)
@@ -216,6 +223,8 @@ package
 					addLog("You cast " + selectedSpell.name, TextUI.COLOR_DEFAULT);
 					break;
 			}
+
+			curMana -= selectedSpell.cost;
 
 			selectedSpell.destroy();
 			selectedSpell = null;
@@ -248,6 +257,20 @@ package
 			if (fogBack2.x >= Const.SCREEN_WIDTH)
 				fogBack2.x -= fogBack2.width * 2;
 
+			manaTime += dt;
+
+			while (manaTime > 1 * (1/rechargeRate))
+			{
+				manaTime -= 1;
+				curMana += 1;
+			}
+
+			if (curMana >= maxMana)
+			{
+				curMana = maxMana;
+				rechargeRate = 1;
+			}
+
 			if (isGameOver)
 				return;
 
@@ -275,6 +298,7 @@ package
 			statBar.food = simulation.currentFood;
 			statBar.foodRate = simulation.foodTrend;
 			statBar.population = simulation.currentPopulation;
+			statBar.mana = curMana;
 
 			if (simulation.currentFood != pFood && simulation.currentFood == 0)
 			{
@@ -294,13 +318,22 @@ package
 			}
 
 
-			if (Card.selectedCard() != null)
+			if (Card.selectedCard() != null && !targetingMode)
 			{
 				cardPlayer.visible = true;
 			}
 			else
 			{
 				cardPlayer.visible = false;
+			}
+
+			if (selectedSpell != null && targetingMode)
+			{
+				selectedSpell.alpha = .3;
+			}
+			else if (selectedSpell != null)
+			{
+				selectedSpell.alpha = 1;
 			}
 
 			for (var i:int = 0; i < entities.length; i++)
