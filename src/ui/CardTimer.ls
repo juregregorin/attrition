@@ -95,15 +95,25 @@ package ui
 			//holder.rotation = rotation;
 
 			g.clear();
-			if (state != STATE_CARD_READY)
+
+			if (Card.handIsFull())
+			{
+				format.size = 30;
+				format.color = 0x858585;
+				g.textFormat(format);
+				g.drawTextLine(0, 0, "Full");
+			}
+			else if (state != STATE_CARD_READY)
 			{
 				format.size = 45;
+				format.color = 0xFFFFFF;
 				g.textFormat(format);
 				g.drawTextLine(0, 0, Math.ceil(cardInterval - cardTimer) + "");
 			}
 			else
 			{
 				format.size = 30;
+				format.color = 0xFFFFFF;
 				g.textFormat(format);
 				g.drawTextLine(0, 0, "Ready");
 			}
@@ -120,7 +130,10 @@ package ui
 
 		override public function tick(dt:Number)
 		{
-			if (state == STATE_IDLE)
+			if (Card.handIsFull())
+				resetTimer();
+
+			if (state == STATE_IDLE && !Card.handIsFull())
 				cardTimer += dt;
 
 			if (cardTimer >= cardInterval)
@@ -131,7 +144,7 @@ package ui
 			}
 
 			if (state == STATE_CARD_READY)
-				glowTime += dt * 2;
+				Card.newCard();
 
 			super.tick(dt);
 		}

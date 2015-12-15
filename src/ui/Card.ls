@@ -205,7 +205,7 @@ package ui
 					cardName = "Sacrifice";
 					manaCost = Math.randomRangeInt(0, 1) ? 0 : 4;
 					targetEffect = manaCost == 0 ? TARGET_SINGLE : TARGET_AREA;
-					spellDescription = "Sacrifice " + (manaCost == 0? "1" : "9") +" of the population in the target "
+					spellDescription = "Sacrifice up to " + (manaCost == 0? "1" : "9") +" of the population in the target "
 									 + (manaCost == 0 ? "tile" : "area") + ". You gain 1 aether for each sacrifice.";
 			}
 		}
@@ -218,6 +218,7 @@ package ui
 			c.render();
 			c.x = -environment.getCardUI().x + 1280 / 2;
 			c.y = -environment.getCardUI().y - c.cardBase.height;
+			c.scale = minScale;
 
 			CARD_DECK.push(c);
 		}
@@ -356,6 +357,8 @@ package ui
 		{
 			if (state == STATE_IN_DECK || state == STATE_DRAWING) return;
 			var touch:Touch = null;
+
+			if (environment.isTargeting()) return;
 
 			// Click
 			touch = e.getTouch(cardBase, TouchPhase.BEGAN);

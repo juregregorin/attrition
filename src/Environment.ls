@@ -33,8 +33,6 @@ package
 
 		private var logText:TextUI;
 
-		private var tempStats:TextUI;
-
 		private var testProgress:ProgressUI;
 		private var cards:Sprite;
 
@@ -53,10 +51,16 @@ package
 
 		private var selectedSpell:Card = null;
 		private var targetingMode:Boolean = false;
+		private var canPlaySpells:Boolean = true;
 
 		private var isGameOver = false;
 
 		private var gameOverOverlay:Image;
+
+		private var pFood:Number = 0;
+		private var pPop:Number = 0;
+		private var popTrend:Number = 0;
+		private var pMana:Number = 0;
 
 		public function Environment(stage:Stage)
 		{
@@ -83,9 +87,10 @@ package
 			fogBack2.x = fogBack.width;
 			stage.addChild(fogBack2);
 
-			logText = new TextUI(15);
+			logText = new TextUI(10);
+			logText.rowOffset = -10;
 			logText.x = 5;
-			logText.y = stage.stageHeight - (15 * logText.format.size + 5);
+			logText.y = 720 - (10 * (logText.format.size - 10) + 5);
 
 			cardPlayer = new Sprite();
 			var cp = new Image(Texture.fromAsset("assets/play-card.png"));
@@ -95,9 +100,6 @@ package
 			cardPlayer.y = stage.stageHeight - cardPlayer.height / 2;
 			ui.addChild(cardPlayer);
 			cardPlayer.addEventListener(TouchEvent.TOUCH, touchEvent);
-
-			tempStats = new TextUI(3);
-			tempStats.rowOffset = -10;
 
 			testProgress = new ProgressUI();
 
@@ -183,14 +185,14 @@ package
 			{
 				case Card.TYPE_MEDITATE:
 					// TODO add mana
-					addLog("Meditate", TextUI.COLOR_POSITIVE);
+					addLog("You cast " + selectedSpell.name, TextUI.COLOR_POSITIVE);
 					break;
 				case Card.TYPE_RAIN:
 					for (var i = 0; i < t.length; i++)
 					{
 						t[i].water += selectedSpell.intensity / 100;
 					}
-					addLog("Downpour", TextUI.COLOR_POSITIVE);
+					addLog("You cast " + selectedSpell.name, TextUI.COLOR_DEFAULT);
 					break;
 				case Card.TYPE_SACRIFICE:
 					if (selectedSpell.target == Card.TARGET_SINGLE)
@@ -199,20 +201,19 @@ package
 					}
 					else
 					{
-						tile.population = Math.max(0, tile.population - 1);
 						for (i = 0; i < t.length; i++)
 						{
 							t[i].population = Math.max(0, tile.population - 1);
 						}
 					}
-					addLog("Sacrifice", TextUI.COLOR_NEGATIVE);
+					addLog("You cast " + selectedSpell.name, TextUI.COLOR_DEFAULT);
 					break;
 				case Card.TYPE_FOOD:
 					for (i = 0; i < t.length; i++)
 					{
 						t[i].foodBonus += selectedSpell.intensity / 100;
 					}
-					addLog("Plentiful Harvest", TextUI.COLOR_POSITIVE);
+					addLog("You cast " + selectedSpell.name, TextUI.COLOR_DEFAULT);
 					break;
 			}
 
@@ -259,6 +260,7 @@ package
 			if (!Card.handIsFull() && !Card.deckIsEmpty())
 			{
 				Card.drawCard();
+				cardTimer.resetTimer();
 			}
 
 			testProgress.progress = testProgress.progress >= 1 ? testProgress.progress - 1 : testProgress.progress + dt;
@@ -268,9 +270,38 @@ package
 
 		public function render()
 		{
-			tempStats.setText("Current population: " + simulation.currentPopulation, TextUI.COLOR_POSITIVE);
-			tempStats.setText("Current food: " + simulation.currentFood, TextUI.COLOR_NEGATIVE);
-			tempStats.setText("Food trend: " + simulation.foodTrend);
+			//trace("Food trend: " + simulation.foodTrend);
+
+			statBar.food = simulation.currentFood;
+			statBar.foodRate = simulation.foodTrend;
+			statBar.population = simulation.currentPopulation;
+
+			if (simulation.currentFood != pFood && simulation.currentFood == 0)
+			{
+				pFood = simulation.currentFood;
+				addLog("Food reserves empty!", TextUI.COLOR_NEGATIVE);
+			}
+
+			if (simulation.currentPopulation != pPop)
+			{
+				if (popTrend > 0 && simulation.currentPopulation < pPop)
+					addLog("Population is falling!", TextUI.COLOR_NEGATIVE);
+				else if (popTrend < 0 && simulation.currentPopulation > pPop)
+					addLog("Population is rising!", TextUI.COLOR_POSITIVE);
+
+				pPop = simulation.currentPopulation < pPop ? -1 : simulation.currentPopulation > pPop ? 1 : 0;
+				pPop = simulation.currentPopulation;
+			}
+
+
+			if (Card.selectedCard() != null)
+			{
+				cardPlayer.visible = true;
+			}
+			else
+			{
+				cardPlayer.visible = false;
+			}
 
 			for (var i:int = 0; i < entities.length; i++)
 			{
@@ -301,14 +332,7 @@ package
 
 		private function touchEvent(e:TouchEvent)
 		{
-			var touch:Touch = e.getTouch(cardTimer.touchableObject, TouchPhase.BEGAN);
-			if (touch && cardTimer.canDraw())
-			{
-				Card.newCard();
-				cardTimer.resetTimer();
-			}
-
-			touch = e.getTouch(cardPlayer, TouchPhase.BEGAN);
+			var touch:Touch = e.getTouch(cardPlayer, TouchPhase.BEGAN);
 			if (touch)
 			{
 				if (selectedSpell == null)
